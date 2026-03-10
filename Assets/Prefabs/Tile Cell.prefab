@@ -169,7 +169,6 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: 067538f22207f124aa5fda54dfee26a4, type: 2}
   - data: {fileID: 11400000, guid: b0494f3a05fcd47498734f7cc889ce65, type: 2}
   iconSprite: {fileID: 7526149306974187418}
-  target: {fileID: 0}
 --- !u!1 &8233383294106582482
 GameObject:
   m_ObjectHideFlags: 0
