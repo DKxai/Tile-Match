@@ -4,10 +4,14 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using DG.Tweening;
 using Unity.VisualScripting;
+
 public class TileCell : MonoBehaviour
 {
-    public List<Tile> tiles;
+    //public List<Tile> tiles;
     public Transform iconSprite;
+
+    public int ID;
+
     //public Transform target;
     //public SelectedBaseShell SelectedBaseShell;
     private bool clicked = false;
@@ -15,12 +19,15 @@ public class TileCell : MonoBehaviour
 
     private void Start()
     {
-        int counter = tiles.Count;
-        random = Random.Range(0, counter);
+        // int counter = tiles.Count;
+        // random = Random.Range(0, counter);
 
-        SpriteRenderer sr = iconSprite.GetComponent<SpriteRenderer>();
-        sr.sprite = tiles[random].iconSprite;
+        // SpriteRenderer sr = iconSprite.GetComponent<SpriteRenderer>();
+        // sr.sprite = tiles[random].iconSprite;
         // VibrateCell();
+        // transform.DOPunchScale(new Vector3(0.5f, 0.5f, 0f), 1f, 3, 0.5f);
+        transform.DOPunchScale(Vector3.one * 0.3f, 0.5f, 10, 0.8f);
+        
     }
 
     private void OnMouseDown()
@@ -116,4 +123,5 @@ public class TileCell : MonoBehaviour
     void DestroyCell()
     {
     }
+    // Random theo ti le 3 sao cho luon co cap 3 
 }

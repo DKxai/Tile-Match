@@ -10,7 +10,7 @@ public class BaseShellManager : MonoBehaviour
 
     public List<Transform> slots = new List<Transform>();
     public List<TileCell> tilesInShell = new List<TileCell>();
-    Dictionary<int, List<int>> similarTilesID = new Dictionary<int, List<int>>();
+    Dictionary<int, List<int>> similarTilesID = new Dictionary<int, List<int>>(); // List(nums of tiles, first Position)
 
     private void Awake()
     {
@@ -26,44 +26,73 @@ public class BaseShellManager : MonoBehaviour
             return;
         }
 
-        tilesInShell.Add(tile);
-
-        int index = tilesInShell.Count - 1;
-        tile.transform.DOMove(slots[index].position, 0.5f).SetEase(Ease.Linear);
-
-        int id = tile.tiles[tile.random].id;
+        int index;
+        int id = tile.ID;
         if (!similarTilesID.ContainsKey(id))
         {
-            similarTilesID[id] = new List<int>();
+            if (tilesInShell.Count == 0) index = 0;
+            else index = tilesInShell.Count;
+            similarTilesID[id] = new List<int>()
+            {
+                1,
+                index
+            };
+
+            tilesInShell.Add(tile);
+        }
+        else
+        {
+            index = similarTilesID[id][0] + similarTilesID[id][1];
+            similarTilesID[id][0]++;
+            tilesInShell.Insert(index, tile);
         }
 
-        similarTilesID[id].Add(index);
+        for (int i = 0; i < tilesInShell.Count; i++)
+        {
+            if (index > i - 1) continue;
+
+            tilesInShell[i].transform.DOMove(slots[i].position, 0.5f).SetEase(Ease.OutExpo);
+            similarTilesID[tilesInShell[i].ID][1]++;
+        }
+
+        tile.transform.DOMove(slots[index].position, 0.5f).SetEase(Ease.Linear);
+
+        // similarTilesID[id].Add(index);
 
         CheckMatch(id);
     }
 
     void CheckMatch(int id)
     {
-        if (!similarTilesID.ContainsKey(id)) return;
-        if (similarTilesID[id].Count < 3) return;
-        List<int> indexes = similarTilesID[id];
-        RemoveMatch(indexes, id);
+        if (!similarTilesID.TryGetValue(id, out var similarID)) return;
+        if (similarID[0] < 3) return;
+        int indexOfFirstOne = similarID[1];
+        RemoveMatch(indexOfFirstOne, id);
     }
 
-    void RemoveMatch(List<int> indexes, int id)
+    void ChangeIndex(TileCell cell, int num)
     {
-        indexes.Sort();
-        indexes.Reverse();
-        int targetIndex = 4;
-        foreach (int i in indexes)
+    }
+
+    void RemoveMatch(int index, int id)
+    {
+        for (int i = 0; i < 3; i++)
         {
-            Vector3 targetPosition = slots[targetIndex].position + new Vector3(0, 1, 0);
-            targetIndex--;
-            TileCell tile = tilesInShell[i];
-            tile.transform.DOMove( /*tile.transform.position + new Vector3(0, 2, 0)*/ targetPosition, 0.5f)
-                .OnComplete(() => { Destroy(tile.gameObject); });
-            tilesInShell.RemoveAt(i);
+            TileCell tile = tilesInShell[index];
+            tile.transform.DOPunchScale(new Vector3(0.5f, 0.5f, 0f), 0.5f, 3, 0.8f);
+            tilesInShell.RemoveAt(index);
+            Destroy(tile.gameObject, 1f);
         }
+
+        // foreach (int i in indexes)
+        // {
+        //     Vector3 targetPosition = slots[targetIndex].position + new Vector3(0, 1, 0);
+        //     targetIndex--;
+        //     TileCell tile = tilesInShell[i];
+        //     tile.transform.DOMove( /*tile.transform.position + new Vector3(0, 2, 0)*/ targetPosition, 0.5f)
+        //         .OnComplete(() => { Destroy(tile.gameObject); });
+        //     tilesInShell.RemoveAt(i);
+        // }
 
         similarTilesID.Remove(id);
         RebuildDictionary();
@@ -74,7 +103,7 @@ public class BaseShellManager : MonoBehaviour
     {
         for (int i = 0; i < tilesInShell.Count; i++)
         {
-            tilesInShell[i].transform.DOMove(slots[i].position, 0.5f).SetEase(Ease.OutExpo);
+            tilesInShell[i].transform.DOMove(slots[i].position, 0.5f).SetEase(Ease.OutExpo).SetDelay(1.2f);
         }
     }
 
@@ -83,13 +112,22 @@ public class BaseShellManager : MonoBehaviour
         similarTilesID.Clear();
         for (int i = 0; i < tilesInShell.Count; i++)
         {
-            int id = tilesInShell[i].tiles[tilesInShell[i].random].id;
+            int id = tilesInShell[i].ID;
+            int index;
             if (!similarTilesID.ContainsKey(id))
             {
-                similarTilesID[id] = new List<int>();
+                if (tilesInShell.Count == 0) index = 0;
+                else index = tilesInShell.Count;
+                similarTilesID[id] = new List<int>()
+                {
+                    1,
+                    i
+                };
             }
-
-            similarTilesID[id].Add(i);
+            else
+            {
+                index = similarTilesID[id][0] + similarTilesID[id][1] - 3;
+            }
         }
     }
 }
