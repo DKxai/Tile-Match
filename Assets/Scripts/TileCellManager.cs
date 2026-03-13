@@ -24,7 +24,7 @@ public class TileCellManager : MonoBehaviour
         foreach (Transform child in transform)
         {
             cells.Add(child.GetComponent<TileCell>());
-            Debug.Log($"{child.name} has been added to List.");
+           // Debug.Log($"{child.name} has been added to List.");
         }
 
         IsValidNumberOfTileCell = CheckNumberOfTileCell();
@@ -38,7 +38,7 @@ public class TileCellManager : MonoBehaviour
         cellCounter = transform.childCount;
         if (cellCounter < 3 || cellCounter % 3 != 0)
         {
-            Debug.Log("Invalid tile cell numbers.");
+           // Debug.Log("Invalid tile cell numbers.");
             return false;
         }
 
@@ -57,12 +57,12 @@ public class TileCellManager : MonoBehaviour
                 int randomCell = Random.Range(0, cells.Count);
                 cells[randomCell].iconSprite.GetComponent<SpriteRenderer>().sprite = tiles[randomTile].iconSprite;
                 cells[randomCell].ID = tiles[randomTile].id;
-                Debug.Log($"{cells[randomCell].gameObject.name} Added icon sprite with ID {cells[randomCell].ID}.");
+               // Debug.Log($"{cells[randomCell].gameObject.name} Added icon sprite with ID {cells[randomCell].ID}.");
                 
-                Debug.Log($"remove {cells[randomCell].gameObject.name}th from List.");
+                // Debug.Log($"remove {cells[randomCell].gameObject.name}th from List.");
                 cells.Remove(cells[randomCell]);
                 
-                Debug.Log($"{cells.Count} remaining cells in List.");
+                // Debug.Log($"{cells.Count} remaining cells in List.");
             }
         }
     }

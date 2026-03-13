@@ -10,7 +10,9 @@ public class BaseShellManager : MonoBehaviour
 
     public List<Transform> slots = new List<Transform>();
     public List<TileCell> tilesInShell = new List<TileCell>();
-    Dictionary<int, List<int>> similarTilesID = new Dictionary<int, List<int>>(); // List(nums of tiles, first Position)
+    Dictionary<int, List<int>> similarTiles = new Dictionary<int, List<int>>(); // List(nums of tiles, first Position)
+    private List<TileCell> destroyingCellS = new List<TileCell>();
+    bool isDestroying = false;
 
     private void Awake()
     {
@@ -20,7 +22,12 @@ public class BaseShellManager : MonoBehaviour
 
     public void AddTile(TileCell tile)
     {
-        if (tilesInShell.Count >= 7)
+        Debug.Log($"1. Destroying Process is :{isDestroying}");
+        Debug.Log($"Destroying Cell is {destroyingCellS.Count} + tile in shell {tilesInShell.Count}");
+        int fullSlots = isDestroying ? slots.Count : slots.Count - 1;
+        int filledSlot = tilesInShell.Count /*+ destroyingCellS.Count*/;
+        Debug.Log($"filled slots:{filledSlot}  full slots:{fullSlots}");
+        if (filledSlot >= fullSlots)
         {
             Debug.Log("Shell full!");
             return;
@@ -28,11 +35,12 @@ public class BaseShellManager : MonoBehaviour
 
         int index;
         int id = tile.ID;
-        if (!similarTilesID.ContainsKey(id))
+        if (!similarTiles.ContainsKey(id))
         {
             if (tilesInShell.Count == 0) index = 0;
-            else index = tilesInShell.Count;
-            similarTilesID[id] = new List<int>()
+            // else index = tilesInShell.Count;
+            else index = filledSlot;
+            similarTiles[id] = new List<int>()
             {
                 1,
                 index
@@ -42,83 +50,105 @@ public class BaseShellManager : MonoBehaviour
         }
         else
         {
-            index = similarTilesID[id][0] + similarTilesID[id][1];
-            similarTilesID[id][0]++;
+            index = similarTiles[id][0] + similarTiles[id][1];
+
+            similarTiles[id][0]++;
+            Debug.Log($"index of Added Tiled is {index} +  tile in shell {tilesInShell.Count} + full slot {fullSlots}");
             tilesInShell.Insert(index, tile);
         }
 
+        int counterFor2SimilarTiles = 0;
+        Sequence sequence = DOTween.Sequence();
         for (int i = 0; i < tilesInShell.Count; i++)
         {
-            if (index > i - 1) continue;
+            if (i <= index) continue;
 
-            tilesInShell[i].transform.DOMove(slots[i].position, 0.5f).SetEase(Ease.OutExpo);
-            similarTilesID[tilesInShell[i].ID][1]++;
+            sequence.Join(tilesInShell[i].transform.DOMove(slots[i].position, 0.35f).SetEase(Ease.OutExpo));
+            if (similarTiles[tilesInShell[i].ID][0] == 2 && counterFor2SimilarTiles == 1)
+            {
+                counterFor2SimilarTiles = 0;
+                continue;
+            }
+
+            similarTiles[tilesInShell[i].ID][1]++;
+            counterFor2SimilarTiles++;
         }
 
-        tile.transform.DOMove(slots[index].position, 0.5f).SetEase(Ease.Linear);
+        sequence.Join(tile.transform.DOMove(slots[index].position, 0.35f).SetEase(Ease.OutExpo));
 
-        // similarTilesID[id].Add(index);
-
-        CheckMatch(id);
+        sequence.OnComplete(() => { CheckMatch(id); });
     }
 
     void CheckMatch(int id)
     {
-        if (!similarTilesID.TryGetValue(id, out var similarID)) return;
+        if (!similarTiles.TryGetValue(id, out var similarID)) return;
         if (similarID[0] < 3) return;
+        isDestroying = true;
         int indexOfFirstOne = similarID[1];
-        RemoveMatch(indexOfFirstOne, id);
-    }
+        Debug.Log($"2. Destroying Process is :{isDestroying}");
 
-    void ChangeIndex(TileCell cell, int num)
-    {
+        RemoveMatch(indexOfFirstOne, id);
+        Debug.Log($"2. Destroying Cell {destroyingCellS.Count}");
     }
 
     void RemoveMatch(int index, int id)
     {
         for (int i = 0; i < 3; i++)
         {
-            TileCell tile = tilesInShell[index];
-            tile.transform.DOPunchScale(new Vector3(0.5f, 0.5f, 0f), 0.5f, 3, 0.8f);
-            tilesInShell.RemoveAt(index);
-            Destroy(tile.gameObject, 1f);
+            destroyingCellS.Add(tilesInShell[index + i]);
         }
 
-        // foreach (int i in indexes)
-        // {
-        //     Vector3 targetPosition = slots[targetIndex].position + new Vector3(0, 1, 0);
-        //     targetIndex--;
-        //     TileCell tile = tilesInShell[i];
-        //     tile.transform.DOMove( /*tile.transform.position + new Vector3(0, 2, 0)*/ targetPosition, 0.5f)
-        //         .OnComplete(() => { Destroy(tile.gameObject); });
-        //     tilesInShell.RemoveAt(i);
-        // }
+        Debug.Log($"2. Destroying Cell {destroyingCellS.Count}");
+        Debug.Log($"Destroying Process is :{isDestroying}");
 
-        similarTilesID.Remove(id);
-        RebuildDictionary();
-        SlideTiles();
+
+        Sequence sq = DOTween.Sequence();
+        foreach (var tileCell in destroyingCellS)
+        {
+            tileCell.transform.DOKill();
+            sq.Join(tileCell.transform.DOPunchScale(new Vector3(0.5f, 0.5f, 0f), 0.5f, 3, 0.8f)
+                .OnComplete(() =>
+                {
+                    Destroy(tileCell.gameObject);
+                    Debug.Log($"3. Destroying Process is :{isDestroying}");
+
+                    destroyingCellS.Remove(tileCell);
+                    tilesInShell.Remove(tileCell);
+                }));
+        }
+
+        sq.OnComplete(() =>
+        {
+            similarTiles.Remove(id);
+            Debug.Log($"2. Destroying Cell {destroyingCellS.Count}");
+
+            RebuildDictionary();
+            isDestroying = false;
+            Debug.Log($"4. Destroying Process is :{isDestroying}");
+            SlideTiles();
+        });
     }
 
     void SlideTiles()
     {
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendInterval(0.1f);
         for (int i = 0; i < tilesInShell.Count; i++)
         {
-            tilesInShell[i].transform.DOMove(slots[i].position, 0.5f).SetEase(Ease.OutExpo).SetDelay(1.2f);
+            sequence.Join(
+                tilesInShell[i].transform.DOMove(slots[i].position, 0.35f).SetEase(Ease.OutExpo));
         }
     }
 
     void RebuildDictionary()
     {
-        similarTilesID.Clear();
+        similarTiles.Clear();
         for (int i = 0; i < tilesInShell.Count; i++)
         {
             int id = tilesInShell[i].ID;
-            int index;
-            if (!similarTilesID.ContainsKey(id))
+            if (!similarTiles.ContainsKey(id))
             {
-                if (tilesInShell.Count == 0) index = 0;
-                else index = tilesInShell.Count;
-                similarTilesID[id] = new List<int>()
+                similarTiles[id] = new List<int>()
                 {
                     1,
                     i
@@ -126,7 +156,7 @@ public class BaseShellManager : MonoBehaviour
             }
             else
             {
-                index = similarTilesID[id][0] + similarTilesID[id][1] - 3;
+                similarTiles[id][0]++;
             }
         }
     }
