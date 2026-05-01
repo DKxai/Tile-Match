@@ -18,15 +18,12 @@ namespace Grid_Map
         [Header("Slider")]
         [SerializeField] UnityEngine.UI.Slider slider;
 
-        // Grid này do LevelManager truyền vào qua LoadGrid()
-        // GridView KHÔNG tự tạo TileGrid nữa
         private TileGrid _tileGrid;
         private bool[] layerVisible;
-        private int currentLayer;
-
-        // Tính đúng kích thước từng layer
-        private int GetLayerWidth(int z)  => z % 2 == 0 ? width + 1 : width;
-        private int GetLayerHeight(int z) => z % 2 == 0 ? height + 1 : height;
+        public int currentLayer { get; private set; }
+        public float CellSize => cellSize;
+        public int GetLayerWidth(int z)  => z % 2 == 0 ? width + 1 : width;
+        public int GetLayerHeight(int z) => z % 2 == 0 ? height + 1 : height;
 
         void Start()
         {
@@ -39,10 +36,7 @@ namespace Grid_Map
             OnLayerChanged(slider.value);
         }
 
-        private void Update()
-        {
-            HandleClick();
-        }
+     
 
 
         public void LoadGrid(TileGrid grid)
@@ -85,45 +79,6 @@ namespace Grid_Map
                 layerVisible[currentLayer] = true;
             if (currentLayer - 1 >= 0 && currentLayer - 1 < layerVisible.Length)
                 layerVisible[currentLayer - 1] = true;
-        }
-
-        private void HandleClick()
-        {
-            if (_tileGrid == null) return;
-            if (!Input.GetMouseButtonDown(0)) return;
-            if (Camera.main == null) return;
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane plane = new Plane(Vector3.forward, transform.position);
-
-            if (plane.Raycast(ray, out float distance))
-            {
-                Vector3 worldPos = ray.GetPoint(distance);
-                Vector3 localPos = worldPos - transform.position;
-
-                GetXY(localPos, currentLayer, out int x, out int y);
-
-                int lw = GetLayerWidth(currentLayer);
-                int lh = GetLayerHeight(currentLayer);
-
-                if (x >= 0 && x < lw && y >= 0 && y < lh)
-                {
-                    int current = _tileGrid.GetValue(x, y, currentLayer);
-                    _tileGrid.SetValue(x, y, currentLayer, current == 0 ? 1 : 0);
-                    Debug.Log($"[GridView] SetValue ({x},{y},{currentLayer}) = {(current == 0 ? 1 : 0)}");
-                }
-            }
-        }
-
-        void GetXY(Vector3 localPos, int z, out int x, out int y)
-        {
-            Vector3 offset = (z % 2 == 1)
-                ? new Vector3(cellSize * 0.5f, cellSize * 0.5f, 0)
-                : Vector3.zero;
-
-            localPos -= offset;
-            x = Mathf.FloorToInt(localPos.x / cellSize);
-            y = Mathf.FloorToInt(localPos.y / cellSize);
         }
 
 #if UNITY_EDITOR
