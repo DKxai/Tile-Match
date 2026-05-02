@@ -1,11 +1,12 @@
+using System;
+using _Scripts.Core.Rules;
 using UnityEngine;
 using Grid_Map;
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : Singleton<LevelManager>
 {
     [Header("References")]
     [SerializeField] private GridSpawner spawner;
-    [SerializeField] private GridView gridView;
 
     [Header("Settings")]
     [SerializeField] private int defaultWidth = 8;
@@ -13,6 +14,14 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private int defaultLayers = 5;
 
     public TileGrid CurrentGrid { get; private set; }
+    private GridView _gridView;
+public ITileValidator RuleValidator { get; private set; }
+    protected override void Awake()
+    {
+        base.Awake();
+        RuleValidator = new StaggerGridValidator();
+        _gridView = FindObjectOfType<GridView>();
+    }
 
     void Start()
     {
@@ -23,18 +32,15 @@ public class LevelManager : MonoBehaviour
         CurrentGrid = LevelSaveSystem.LoadLevel(
             levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
-        if (gridView != null)
-            gridView.LoadGrid(CurrentGrid);
+        if (_gridView != null)
+            _gridView.LoadGrid(CurrentGrid);
 
         RefreshView();
     }
 
-    // =========================
-    // Tạo level mới rỗng và lưu ngay
-    // =========================
+
     public void CreateAndSaveNewLevel(int levelIndex)
     {
-        // Tạo TileGrid rỗng với kích thước mặc định
         CurrentGrid = new TileGrid(levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
         LevelSaveSystem.SaveLevel(CurrentGrid);
@@ -44,8 +50,8 @@ public class LevelManager : MonoBehaviour
         Debug.Log($"[LevelManager] New level {levelIndex} created & exported.");
 #endif
 
-        if (gridView != null)
-            gridView.LoadGrid(CurrentGrid);
+        if (_gridView != null)
+            _gridView.LoadGrid(CurrentGrid);
 
         
         RefreshView();
@@ -68,8 +74,8 @@ public class LevelManager : MonoBehaviour
         CurrentGrid = LevelSaveSystem.LoadLevel(
             savedLevel, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
-        if (gridView != null)
-            gridView.LoadGrid(CurrentGrid);
+        if (_gridView != null)
+            _gridView.LoadGrid(CurrentGrid);
 
         RefreshView();
         Debug.Log($"[LevelManager] Level {savedLevel} saved & reloaded.");

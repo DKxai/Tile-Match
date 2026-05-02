@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Utils;
 
 
-public class ShellManager : MonoBehaviour
+public class ShellManager : Singleton<ShellManager>
 {
-    public static ShellManager Instance;
 
     public List<Transform> slots = new List<Transform>();
     public List<TileCell> tilesInShell = new List<TileCell>();
@@ -16,11 +16,8 @@ public class ShellManager : MonoBehaviour
     int fullSlots = 0;
     int filledSlots = 0;
 
-    private void Awake()
-    {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
+    private void OnEnable() => TileEventBus.OnTileClicked += AddTile;
+    private void OnDisable() => TileEventBus.OnTileClicked -= AddTile;
 
     public void AddTile(TileCell tile)
     {

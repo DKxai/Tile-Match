@@ -45,7 +45,6 @@ namespace Grid_Map
             return grid;
         }
 
-        // BUG FIX: Width * Layers → Width * Height
         private int Index(int x, int y, int z) => x + y * Width + z * Width * Height;
     }
 }
