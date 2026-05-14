@@ -9,9 +9,11 @@ namespace Utils
         public static event Action<int> OnTileMatched;
 
         public static event Action OnBoardCleared;
+        public static Action<string, int> OnToolUsed;
         
         public static void TileClicked(TileCell cell) => OnTileClicked?.Invoke(cell);
         public static void TileMatched(int tileID) => OnTileMatched?.Invoke(tileID);
         public static void BoardCleared() => OnBoardCleared?.Invoke();
+        
     }
 }

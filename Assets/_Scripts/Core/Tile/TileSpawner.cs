@@ -21,7 +21,7 @@ public class TileSpawner : MonoBehaviour
         _isValidNumberOfTileCell = CheckNumberOfTileCell();
         if (!_isValidNumberOfTileCell) return;
 
-        RandomSystem();
+        RandomSystem(cells);
     }
 
     private bool CheckNumberOfTileCell()
@@ -29,14 +29,14 @@ public class TileSpawner : MonoBehaviour
         _cellCounter = cells.Count;
         if (_cellCounter < 3 || _cellCounter % 3 != 0)
         {
-            Debug.Log("[TileSpawner] Invalid tile cell numbers.");
+            // Debug.Log("[TileSpawner] Invalid tile cell numbers.");
             return false;
         }
 
         return true;
     }
 
-    private void RandomSystem()
+    public void RandomSystem(List<TileCell> tileCells)
     {
         int randomTimes = _cellCounter / 3;
 
@@ -48,12 +48,12 @@ public class TileSpawner : MonoBehaviour
                 int randomCell = Random.Range(0, cells.Count);
                 cells[randomCell].iconSprite.GetComponent<SpriteRenderer>().sprite = tiles[randomTile].iconSprite;
                 cells[randomCell].ID = tiles[randomTile].id;
-                Debug.Log(
-                    $"[TileSpawner] {cells[randomCell].gameObject.name} Added icon sprite with ID {cells[randomCell].ID}.");
-
-                Debug.Log($"[TileSpawner] remove {cells[randomCell].gameObject.name}th from List.");
+                // Debug.Log(
+                //     $"[TileSpawner] {cells[randomCell].gameObject.name} Added icon sprite with ID {cells[randomCell].ID}.");
+                //
+                // Debug.Log($"[TileSpawner] remove {cells[randomCell].gameObject.name}th from List.");
                 cells.Remove(cells[randomCell]);
-                Debug.Log($"[TileSpawner] {cells.Count} remaining cells in List.");
+                //Debug.Log($"[TileSpawner] {cells.Count} remaining cells in List.");
             }
         }
     }

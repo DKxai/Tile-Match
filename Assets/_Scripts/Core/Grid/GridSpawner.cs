@@ -12,10 +12,12 @@ public class GridSpawner : MonoBehaviour
     [SerializeField] private Transform origin;
     [SerializeField] private TileSpawner tileSpawner;
 
-    public List<TileCell> activeCells = new List<TileCell>();
+    private List<TileCell> _activeCells = new List<TileCell>();
     private TileGrid _currentGrid;
     private Dictionary<Vector3Int, TileCell> _cellMap = new Dictionary<Vector3Int, TileCell>();
-
+    public TileSpawner TileSpawner => tileSpawner;
+    public List<TileCell> ActiveCells => _activeCells;
+    public TileGrid CurrentGrid => _currentGrid;
     private void OnEnable() => TileEventBus.OnTileClicked += HandleTileClicked;
     private void OnDisable() => TileEventBus.OnTileClicked -= HandleTileClicked;
 
@@ -25,6 +27,7 @@ public class GridSpawner : MonoBehaviour
         {
             _currentGrid.SetValue(cell.gridX, cell.gridY, cell.gridZ, 0);
         }
+
         RefreshAffectedCells(cell);
         RemoveCell(cell);
     }
@@ -33,12 +36,12 @@ public class GridSpawner : MonoBehaviour
     {
         _currentGrid = grid;
         _cellMap.Clear();
-        activeCells.Clear();
+        _activeCells.Clear();
         for (int z = 0; z < grid.Layers; z++)
         {
             Vector3 newOrigin = z % 2 == 0 ? origin.position : origin.position + new Vector3(0.5f, 0.5f, 0f) * cellSize
                 ;
-            for (int y = 0; y < grid.Height; y++)
+            for (int y = grid.Height - 1; y >= 0; y--)
             {
                 for (int x = 0; x < grid.Width; x++)
                 {
@@ -46,12 +49,13 @@ public class GridSpawner : MonoBehaviour
                     if (value != 0)
                     {
                         Vector3 worldPos = UtilsClass.GetWorldPosition(newOrigin, x, y, z, cellSize);
+                        worldPos.x -= x * 0.02f;
                         GameObject obj = Instantiate(cellPrefab, worldPos, Quaternion.identity, origin);
                         TileCell cell = obj.GetComponent<TileCell>();
                         if (cell != null)
                         {
-                            cell.SetupCell(x, y, z);
-                            activeCells.Add(cell);
+                            cell.SetupCell(x, y, z, worldPos);
+                            _activeCells.Add(cell);
                             _cellMap[new Vector3Int(x, y, z)] = cell;
                         }
                     }
@@ -65,9 +69,9 @@ public class GridSpawner : MonoBehaviour
         RefreshAllCells(grid);
     }
 
-    void RefreshAllCells(TileGrid grid)
+    public void RefreshAllCells(TileGrid grid)
     {
-        foreach (var cell in activeCells)
+        foreach (var cell in _activeCells)
         {
             if (cell != null)
             {
@@ -93,7 +97,7 @@ public class GridSpawner : MonoBehaviour
 
     private void RemoveCell(TileCell cell)
     {
-        activeCells.Remove(cell);
+        _activeCells.Remove(cell);
         _cellMap.Remove(new Vector3Int(cell.gridX, cell.gridY, cell.gridZ));
     }
 
@@ -120,7 +124,7 @@ public class GridSpawner : MonoBehaviour
 
     public void Clear()
     {
-        activeCells.Clear();
+        _activeCells.Clear();
         _cellMap.Clear();
         _currentGrid = null;
 
