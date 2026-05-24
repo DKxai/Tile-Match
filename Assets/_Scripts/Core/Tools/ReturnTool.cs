@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using _Scripts.Data;
 using DG.Tweening;
 using UnityEngine;
 using Utils;
@@ -45,7 +46,7 @@ namespace _Scripts.Core.Tools
 
             _useLeft--;
 
-            TileEventBus.OnToolUsed?.Invoke("Return", _useLeft);
+            TileEventBus.OnToolUsed?.Invoke(ToolType.Return, _useLeft);
         }
 
         public bool CanExecute() => _shellManager != null && _useLeft >= 0;

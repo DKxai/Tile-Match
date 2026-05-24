@@ -1,3 +1,4 @@
+using _Scripts.Data;
 using Utils;
 
 namespace _Scripts.Core.Tools
@@ -20,7 +21,7 @@ namespace _Scripts.Core.Tools
             _shellManager.AddSlot();
 
             if (_useLeft > 0) _useLeft--;
-            TileEventBus.OnToolUsed?.Invoke("AddSlot",_useLeft);
+            TileEventBus.OnToolUsed?.Invoke(ToolType.AddSlot,_useLeft);
         }
 
         public bool CanExecute() => _shellManager != null && _useLeft > 0;

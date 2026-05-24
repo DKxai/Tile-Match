@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Data;
 using _Scripts.Managers;
 using Grid_Map;
 using TMPro;
@@ -45,27 +46,31 @@ namespace _Scripts.UI
         private void OnDestroy()
         {
             TileEventBus.OnToolUsed -= OnToolUsed;
+            shuffleBtn.onClick.RemoveListener(() => ToolManager.Instance.UseShuffle());
+            addSlotBtn.onClick.RemoveListener(() => ToolManager.Instance.UseAddSlot());
+//            hintBtn.onClick.AddListener(() => ToolManager.Instance.UseHint());
+            returnBtn.onClick.RemoveListener(() => ToolManager.Instance.UseReturn());
         }
 
-        private void OnToolUsed(string commandStr, int useLeft)
+        private void OnToolUsed(ToolType type, int useLeft)
         {
-            switch (commandStr)
+            switch (type)
             {
-                case "Shuffle":
+                case ToolType.Shuffle:
                     UpdateLabel(shuffleText, useLeft);
-                    shuffleBtn.interactable = useLeft != 0;
+                    // shuffleBtn.interactable = useLeft != 0;
                     break;
-                case "AddSlot":
+                case ToolType.AddSlot:
                     UpdateLabel(addSlotText, useLeft);
-                    addSlotBtn.interactable = useLeft != 0;
+                    // addSlotBtn.interactable = useLeft != 0;
                     break;
                 // case "Hint":
                 //     UpdateLabel(hintText, useLeft);
                 //     hintBtn.interactable = useLeft != 0;
                 //     break;
-                case "Return":
+                case ToolType.Return:
                     UpdateLabel(returnText, useLeft);
-                    returnBtn.interactable = useLeft != 0;
+                    // returnBtn.interactable = useLeft != 0;
                     break;
             }
         }

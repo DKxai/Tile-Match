@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Data;
 using UnityEngine;
 using Utils;
 using Random = UnityEngine.Random;
@@ -24,7 +25,7 @@ namespace _Scripts.Core.Tools
 
         public bool CanExecute()
         {
-            return _useLeft >= 0 && _gridSpawner != null;
+            return _useLeft > 0 && _gridSpawner != null;
         }
 
         public int UseLeft => _useLeft;
@@ -58,7 +59,7 @@ namespace _Scripts.Core.Tools
             }
             _gridSpawner.RefreshAllCells(_gridSpawner.CurrentGrid);
             if (_useLeft > 0) _useLeft--;
-            TileEventBus.OnToolUsed?.Invoke("Shuffle", _useLeft);
+            TileEventBus.OnToolUsed?.Invoke(ToolType.Shuffle, _useLeft);
         }
     }
 }

@@ -2,36 +2,42 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Utils;
 
-public class GameInputManager : MonoBehaviour
+namespace _Scripts.Managers
 {
-    private static float lastClickTime = 0f;
-    private float clickCooldown = 0.1f;
-
-    private void Update()
+    public class GameInputManager : PersistentSingleton<GameInputManager>
     {
-        if (Input.GetMouseButtonDown(0))
+        private static float _lastClickTime = 0f;
+        private readonly float clickCooldown = 0.1f;
+
+        private void Update()
         {
-            if (Time.time - lastClickTime >= clickCooldown)
+            if (Input.GetMouseButtonDown(0))
             {
-                HandlePlayerClick();
+                if (Time.time - _lastClickTime >= clickCooldown)
+                {
+                    HandlePlayerClick();
+                }
             }
         }
-    }
 
-    private void HandlePlayerClick()
-    {
-        if (EventSystem.current.IsPointerOverGameObject()) return;
+        private void HandlePlayerClick()
+        {
+            if (EventSystem.current.IsPointerOverGameObject()) return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            if (Camera.main != null)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider == null) return;
+                if (hit.collider == null) return;
 
-        TileCell clickedTile = hit.collider.GetComponent<TileCell>();
-        if (clickedTile == null || clickedTile.IsClicked) return;
-        lastClickTime = Time.time;
-        clickedTile.IsClicked = true;
-        hit.collider.enabled = false;
-        TileEventBus.TileClicked(clickedTile);
+                TileCell clickedTile = hit.collider.GetComponent<TileCell>();
+                if (clickedTile == null || clickedTile.IsClicked) return;
+                _lastClickTime = Time.time;
+                clickedTile.IsClicked = true;
+                hit.collider.enabled = false;
+                TileEventBus.TileClicked(clickedTile);
+            }
+        }
     }
 }

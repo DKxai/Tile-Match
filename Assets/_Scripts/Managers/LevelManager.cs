@@ -1,96 +1,101 @@
-using System;
 using _Scripts.Core.Rules;
-using UnityEngine;
 using Grid_Map;
+using UnityEngine;
 
-public class LevelManager : Singleton<LevelManager>
+namespace _Scripts.Managers
 {
-    [Header("References")]
-    [SerializeField] private GridSpawner spawner;
-
-    [Header("Settings")]
-    [SerializeField] private int defaultWidth = 8;
-    [SerializeField] private int defaultHeight = 8;
-    [SerializeField] private int defaultLayers = 5;
-
-    public TileGrid CurrentGrid { get; private set; }
-    private GridView _gridView;
-public ITileValidator RuleValidator { get; private set; }
-    protected override void Awake()
+    public class LevelManager : Singleton<LevelManager>
     {
-        base.Awake();
-        RuleValidator = new StaggerGridValidator();
-        _gridView = FindObjectOfType<GridView>();
-    }
+        [Header("References")] [SerializeField]
+        private GridSpawner spawner;
 
-    void Start()
-    {
-        LoadLevel(0);
-    }
-    public void LoadLevel(int levelIndex)
-    {
-        CurrentGrid = LevelSaveSystem.LoadLevel(
-            levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+        [SerializeField] private ShellManager shellManager;
+        [Header("Settings")] [SerializeField] private int defaultWidth = 8;
+        [SerializeField] private int defaultHeight = 8;
+        [SerializeField] private int defaultLayers = 5;
 
-        if (_gridView != null)
-            _gridView.LoadGrid(CurrentGrid);
+        public TileGrid CurrentGrid { get; private set; }
+        private GridView _gridView;
+        public ITileValidator RuleValidator { get; private set; }
 
-        RefreshView();
-    }
-
-
-    public void CreateAndSaveNewLevel(int levelIndex)
-    {
-        CurrentGrid = new TileGrid(levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
-
-        LevelSaveSystem.SaveLevel(CurrentGrid);
-
-#if UNITY_EDITOR
-        LevelSaveSystem.ExportToResources(levelIndex);
-        Debug.Log($"[LevelManager] New level {levelIndex} created & exported.");
-#endif
-
-        if (_gridView != null)
-            _gridView.LoadGrid(CurrentGrid);
-
-        
-        RefreshView();
-    }
-
-    public void SaveCurrentLevel()
-    {
-        if (CurrentGrid == null)
+        protected override void Awake()
         {
-            Debug.LogWarning("[LevelManager] Nothing to save.");
-            return;
+            base.Awake();
+            RuleValidator = new StaggerGridValidator();
+            _gridView = FindObjectOfType<GridView>();
         }
 
-        LevelSaveSystem.SaveLevel(CurrentGrid);
+        void Start()
+        {
+            LoadLevel(0);
+            ToolManager.Instance.Initialize(spawner,shellManager);
+        }
+
+        public void LoadLevel(int levelIndex)
+        {
+            CurrentGrid = LevelSaveSystem.LoadLevel(
+                levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+
+            if (_gridView != null)
+                _gridView.LoadGrid(CurrentGrid);
+
+            RefreshView();
+        }
+
+
+        public void CreateAndSaveNewLevel(int levelIndex)
+        {
+            CurrentGrid = new TileGrid(levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+
+            LevelSaveSystem.SaveLevel(CurrentGrid);
 
 #if UNITY_EDITOR
-        LevelSaveSystem.ExportToResources(CurrentGrid.Level);
-
-        int savedLevel = CurrentGrid.Level;
-        CurrentGrid = LevelSaveSystem.LoadLevel(
-            savedLevel, defaultWidth + 1, defaultHeight + 1, defaultLayers);
-
-        if (_gridView != null)
-            _gridView.LoadGrid(CurrentGrid);
-
-        RefreshView();
-        Debug.Log($"[LevelManager] Level {savedLevel} saved & reloaded.");
+            LevelSaveSystem.ExportToResources(levelIndex);
+            Debug.Log($"[LevelManager] New level {levelIndex} created & exported.");
 #endif
-    }
 
-    // public void ClearLevel()
-    // {
-    //     spawner.Clear();
-    //     CurrentGrid = null;
-    // }
+            if (_gridView != null)
+                _gridView.LoadGrid(CurrentGrid);
 
-    private void RefreshView()
-    {
-        spawner.Clear();
-        spawner.Spawn(CurrentGrid);
+
+            RefreshView();
+        }
+
+        public void SaveCurrentLevel()
+        {
+            if (CurrentGrid == null)
+            {
+                Debug.LogWarning("[LevelManager] Nothing to save.");
+                return;
+            }
+
+            LevelSaveSystem.SaveLevel(CurrentGrid);
+
+#if UNITY_EDITOR
+            LevelSaveSystem.ExportToResources(CurrentGrid.Level);
+
+            int savedLevel = CurrentGrid.Level;
+            CurrentGrid = LevelSaveSystem.LoadLevel(
+                savedLevel, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+
+            if (_gridView != null)
+                _gridView.LoadGrid(CurrentGrid);
+
+            RefreshView();
+            Debug.Log($"[LevelManager] Level {savedLevel} saved & reloaded.");
+#endif
+        }
+
+        // public void ClearLevel()
+        // {
+        //     spawner.Clear();
+        //     CurrentGrid = null;
+        // }
+
+        private void RefreshView()
+        {
+            spawner.Clear();
+            spawner.Spawn(CurrentGrid);
+        }
     }
 }
