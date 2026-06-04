@@ -4,6 +4,7 @@ namespace _Scripts.Data
     {
         Shuffle,
         Heart,
+        Ads,
         AddSlot,
         Hint,
         Return,

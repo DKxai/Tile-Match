@@ -1,4 +1,6 @@
 using System.Collections;
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -6,17 +8,27 @@ using Utils;
 
 namespace _Scripts.Systems
 {
-    public class SceneLevelManager : Singleton<SceneLevelManager>
+    public class SceneLevelManager : PersistentSingleton<SceneLevelManager>
     {
         [SerializeField] private CanvasGroup loaderCanvas;
         [SerializeField] private Scrollbar loadingBar;
         private float _target;
 
-        private void Start()
+        private void OnEnable()
         {
-            TileEventBus.OnNodeClicked += LoadScene;
+            EventBus.Subscribe<LevelSelectEvent>(OnLoadScene);
         }
 
+        private void OnDisable()
+        {
+            EventBus.Subscribe<LevelSelectEvent>(OnLoadScene);
+            
+        }
+
+        private void OnLoadScene(LevelSelectEvent evt)
+        {
+            LoadScene(evt.LevelSelected);
+        }
         public void LoadScene(string sceneName)
         {
             StartCoroutine(Load(sceneName));

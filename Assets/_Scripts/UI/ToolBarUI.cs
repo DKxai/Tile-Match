@@ -1,6 +1,8 @@
 using System;
 using _Scripts.Data;
 using _Scripts.Managers;
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using Grid_Map;
 using TMPro;
 using UnityEngine;
@@ -12,65 +14,72 @@ namespace _Scripts.UI
     public class ToolBarUI : MonoBehaviour
     {
         [Header("Buttons")] [SerializeField] private Button shuffleBtn;
-
         [SerializeField] private Button addSlotBtn;
-
-        //   [SerializeField] private Button hintBtn;
         [SerializeField] private Button returnBtn;
 
         [Header("Use Left TMP")] [SerializeField]
         private TMP_Text shuffleText;
 
         [SerializeField] private TMP_Text addSlotText;
-
-        //  [SerializeField] private TMP_Text hintText;
         [SerializeField] private TMP_Text returnText;
 
-        // [Header("References")] [SerializeField]
-        // private ToolData _toolData;
+        private void OnEnable()
+        {
+            EventBus.Subscribe<ToolUseChangeEvent>(UpdateUseLeftText);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<ToolUseChangeEvent>(UpdateUseLeftText);
+        }
 
         private void Awake()
         {
             Init();
-            TileEventBus.OnToolUsed += OnToolUsed;
+        }
+
+        private void Start()
+        {
+            UpdateTextButton();
+        }
+
+        private void UpdateTextButton()
+        {
+            shuffleText.text = ToolManager.Instance.toolData.shuffleUseLeft.ToString();
+            addSlotText.text = ToolManager.Instance.toolData.addSlotUseLeft.ToString();
+            returnText.text = ToolManager.Instance.toolData.returnUseLeft.ToString();
         }
 
         void Init()
         {
-            shuffleBtn.onClick.AddListener(() => ToolManager.Instance.UseShuffle());
-            addSlotBtn.onClick.AddListener(() => ToolManager.Instance.UseAddSlot());
-//            hintBtn.onClick.AddListener(() => ToolManager.Instance.UseHint());
-            returnBtn.onClick.AddListener(() => ToolManager.Instance.UseReturn());
+            shuffleBtn.onClick.AddListener(OnShuffleClicked);
+            addSlotBtn.onClick.AddListener(OnAddSlotClicked);
+            returnBtn.onClick.AddListener(OnReturnClicked);
         }
 
         private void OnDestroy()
         {
-            TileEventBus.OnToolUsed -= OnToolUsed;
-            shuffleBtn.onClick.RemoveListener(() => ToolManager.Instance.UseShuffle());
-            addSlotBtn.onClick.RemoveListener(() => ToolManager.Instance.UseAddSlot());
-//            hintBtn.onClick.AddListener(() => ToolManager.Instance.UseHint());
-            returnBtn.onClick.RemoveListener(() => ToolManager.Instance.UseReturn());
+            shuffleBtn.onClick.RemoveListener(OnShuffleClicked);
+            addSlotBtn.onClick.RemoveListener(OnAddSlotClicked);
+            returnBtn.onClick.RemoveListener(OnReturnClicked);
         }
 
-        private void OnToolUsed(ToolType type, int useLeft)
+        void OnShuffleClicked() => ToolManager.Instance.UseShuffle();
+        void OnAddSlotClicked() => ToolManager.Instance.UseAddSlot();
+        void OnReturnClicked() => ToolManager.Instance.UseReturn();
+
+        private void UpdateUseLeftText(ToolUseChangeEvent evt)
         {
-            switch (type)
+            switch (evt.ToolType)
             {
                 case ToolType.Shuffle:
-                    UpdateLabel(shuffleText, useLeft);
-                    // shuffleBtn.interactable = useLeft != 0;
+                    UpdateLabel(shuffleText, evt.UseLeft);
                     break;
                 case ToolType.AddSlot:
-                    UpdateLabel(addSlotText, useLeft);
-                    // addSlotBtn.interactable = useLeft != 0;
+                    UpdateLabel(addSlotText, evt.UseLeft);
                     break;
-                // case "Hint":
-                //     UpdateLabel(hintText, useLeft);
-                //     hintBtn.interactable = useLeft != 0;
-                //     break;
                 case ToolType.Return:
-                    UpdateLabel(returnText, useLeft);
-                    // returnBtn.interactable = useLeft != 0;
+                    UpdateLabel(returnText, evt.UseLeft);
                     break;
             }
         }

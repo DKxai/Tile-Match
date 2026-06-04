@@ -1,3 +1,5 @@
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Utils;
@@ -20,6 +22,7 @@ namespace _Scripts.Managers
             }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         private void HandlePlayerClick()
         {
             if (EventSystem.current.IsPointerOverGameObject()) return;
@@ -36,7 +39,7 @@ namespace _Scripts.Managers
                 _lastClickTime = Time.time;
                 clickedTile.IsClicked = true;
                 hit.collider.enabled = false;
-                TileEventBus.TileClicked(clickedTile);
+                EventBus.Publish(new TileClickEvent(clickedTile));
             }
         }
     }

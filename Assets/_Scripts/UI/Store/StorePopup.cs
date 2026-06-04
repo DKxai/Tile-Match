@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using _Scripts.Data;
 using _Scripts.Managers;
+using _Scripts.Utils.Event_Bus;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,16 +23,18 @@ namespace _Scripts.UI.Store
         [SerializeField] private Transform content;
         private readonly List<StoreItemUI> _spawnedItems = new();
 
+
         protected virtual void Awake()
         {
-            closeButton.onClick.AddListener(Close);
+            closeButton.onClick.AddListener(Hide);
         }
 
         protected virtual void OnDestroy()
         {
-            closeButton.onClick.RemoveListener(Close);
+            closeButton.onClick.RemoveListener(Hide);
         }
 
+       
         public override void Show()
         {
             base.Show();
@@ -109,10 +112,5 @@ namespace _Scripts.UI.Store
         }
 
         #endregion
-
-        private void Close()
-        {
-            UIManager.Instance.Close(this);
-        }
     }
 }

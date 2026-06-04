@@ -11,7 +11,7 @@ namespace _Scripts.UI
             PlayShowAnimation();
         }
 
-        public virtual void Hide()
+        protected virtual void Hide()
         {
             PlayHideAnimation();
             

@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Systems : PersistentSingleton<Systems>
+namespace _Scripts.Systems
 {
+    public class Systems : PersistentSingleton<Systems>
+    {
+    }
 }

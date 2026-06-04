@@ -1,4 +1,7 @@
 using _Scripts.Core.Rules;
+using _Scripts.Core.Tile;
+using _Scripts.Data;
+using _Scripts.SaveSystem;
 using Grid_Map;
 using UnityEngine;
 
@@ -28,7 +31,7 @@ namespace _Scripts.Managers
         void Start()
         {
             LoadLevel(0);
-            ToolManager.Instance.Initialize(spawner,shellManager);
+            ToolManager.Instance.Initialize(spawner, shellManager);
         }
 
         public void LoadLevel(int levelIndex)

@@ -10,5 +10,9 @@ namespace _Scripts.Data
         public string description;
         public Sprite icon;
         public string confirm;
+        public int cost;
+        public int amount;
+        public bool isDisplayCoinUi;
+        public bool isDisplayHeartUI;
     }
 }

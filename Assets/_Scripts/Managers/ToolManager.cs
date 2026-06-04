@@ -1,59 +1,76 @@
 using System;
 using System.Collections.Generic;
+using _Scripts.Core.Tile;
 using _Scripts.Core.Tools;
 using _Scripts.Data;
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using Grid_Map;
 using UnityEngine;
 using Utils;
 
 namespace _Scripts.Managers
 {
-    public class ToolManager: Singleton<ToolManager>
+    public class ToolManager : Singleton<ToolManager>
     {
-        [Header("Invoker & Receiver")]
-        [SerializeField] private ToolData toolData;
+        [Header("Invoker & Receiver")] public ToolData toolData;
 
         private GridSpawner _gridSpawner;
         private ShellManager _shellManager;
         private readonly Dictionary<ToolType, IToolCommand> _commands = new Dictionary<ToolType, IToolCommand>();
+
+        private void OnEnable()
+        {
+            EventBus.Subscribe<PurchaseEvent>(AddUse);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<PurchaseEvent>(AddUse);
+        }
+
         public void Initialize(GridSpawner gridSpawner, ShellManager shellManager)
         {
             _gridSpawner = gridSpawner;
             _shellManager = shellManager;
             InitCommands();
         }
+
+
         private void InitCommands()
         {
             _commands.Clear();
-          _commands[ToolType.Shuffle] = new ShuffleTool(_gridSpawner,toolData.shuffleUseInALevel);
-            _commands[ToolType.AddSlot] = new AddSlotTool(_shellManager,toolData.addSlotUseInALevel);
-            _commands[ToolType.Hint] = new HintTool();
-          _commands[ToolType.Return] = new ReturnTool(_shellManager,3);
+            _commands[ToolType.Shuffle] = new ShuffleTool(_gridSpawner, toolData.shuffleUseLeft);
+            _commands[ToolType.AddSlot] = new AddSlotTool(_shellManager, toolData.addSlotUseLeft);
+            _commands[ToolType.Return] = new ReturnTool(_shellManager, toolData.returnUseLeft);
         }
 
         public void UseShuffle() => Execute(ToolType.Shuffle);
-        public void UseAddSlot()=> Execute(ToolType.AddSlot);
-        public void UseHint()=> Execute(ToolType.Hint);
+        public void UseAddSlot() => Execute(ToolType.AddSlot);
         public void UseReturn() => Execute(ToolType.Return);
 
         private void Execute(ToolType toolType)
         {
-            if (!_commands.TryGetValue(toolType,out var command)) return;
+            if (!_commands.TryGetValue(toolType, out var command)) return;
 
-            if (!command.CanExecute())
+            if (GetUseLeft(toolType) == 0)
             {
-                TileEventBus.OnToolOutOfUse?.Invoke(toolType);
-                 return;
+                EventBus.Publish(new OutOfToolUseEvent(toolType));
+                return;
             }
+
             command.Execute();
-            
         }
 
         public void ResetForNewLevel() => InitCommands();
 
-        public int GetUseLeft(ToolType toolType) =>
+        private int GetUseLeft(ToolType toolType) =>
             _commands.TryGetValue(toolType, out var command) ? command.UseLeft : 0;
 
+        public void AddUse(PurchaseEvent evt)
+        {
+            if (!_commands.TryGetValue(evt.ToolType, out var command)) return;
+            command.AddingUses(evt.Amount);
+        }
     }
-
 }

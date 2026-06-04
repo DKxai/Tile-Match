@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using Grid_Map;
 using UnityEngine;
 using Utils;
@@ -18,11 +20,12 @@ public class GridSpawner : MonoBehaviour
     public TileSpawner TileSpawner => tileSpawner;
     public List<TileCell> ActiveCells => _activeCells;
     public TileGrid CurrentGrid => _currentGrid;
-    private void OnEnable() => TileEventBus.OnTileClicked += HandleTileClicked;
-    private void OnDisable() => TileEventBus.OnTileClicked -= HandleTileClicked;
+    private void OnEnable() => EventBus.Subscribe<TileClickEvent>(OnTileClicked);
+    private void OnDisable() => EventBus.Unsubscribe<TileClickEvent>(OnTileClicked);
 
-    private void HandleTileClicked(TileCell cell)
+    private void OnTileClicked(TileClickEvent e)
     {
+        TileCell cell = e.TileCell;
         if (_currentGrid != null)
         {
             _currentGrid.SetValue(cell.gridX, cell.gridY, cell.gridZ, 0);

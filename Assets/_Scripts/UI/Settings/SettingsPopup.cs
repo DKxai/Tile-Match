@@ -58,7 +58,7 @@ namespace _Scripts.UI.Settings
             musicToggle.onValueChanged.AddListener(OnMusicChanged);
             soundToggle.onValueChanged.AddListener(OnSoundChanged);
             vibrationToggle.onValueChanged.AddListener(OnVibrationChanged);
-            closeButton.onClick.AddListener(Close);
+            closeButton.onClick.AddListener(Hide);
         }
 
         private void UnregisterEvents()
@@ -67,7 +67,7 @@ namespace _Scripts.UI.Settings
             soundToggle.onValueChanged.RemoveListener(OnSoundChanged);
             vibrationToggle.onValueChanged.RemoveListener(OnVibrationChanged);
 
-            closeButton.onClick.RemoveListener(Close);
+            closeButton.onClick.RemoveListener(Hide);
         }
 
         #endregion
@@ -88,11 +88,7 @@ namespace _Scripts.UI.Settings
         {
             SettingsManager.Instance.SetVibration(value);
         }
-
-        private void Close()
-        {
-            UIManager.Instance.Close(this);
-        }
+        
 
         #endregion
 

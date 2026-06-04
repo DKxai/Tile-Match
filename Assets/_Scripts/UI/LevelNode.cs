@@ -1,3 +1,5 @@
+using _Scripts.Utils;
+using _Scripts.Utils.Event_Bus;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -97,7 +99,7 @@ namespace _Scripts.UI
 
             PlayerPrefs.SetInt("SelectedLevel", _levelIndex);
             string level = "Level" + _levelIndex;
-            TileEventBus.OnNodeClicked(level);
+            EventBus.Publish(new LevelSelectEvent(level));
         }
     }
 }

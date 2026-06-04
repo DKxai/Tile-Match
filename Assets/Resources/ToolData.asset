@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shuffleCoinCost: 0
   shuffleUseInALevel: 3
+  shuffleUseLeft: 1
   addSlotCoinCost: 0
   addSlotUseInALevel: 1
+  addSlotUseLeft: 1
   returnCoinCost: 0
-  hintCoinCost: 0
+  returnUseInALevel: 1
+  returnUseLeft: 1

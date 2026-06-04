@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _Scripts.Managers
 {
-    public class SettingsManager : StaticInstance<SettingsManager>
+    public class SettingsManager : Singleton<SettingsManager>
     {
         public SettingData SettingData { get; private set; }
 
@@ -15,11 +15,12 @@ namespace _Scripts.Managers
 
         private void Load()
         {
-            SettingData = new SettingData();
-
-            SettingData.SoundEnable = PlayerPrefs.GetInt("Sound", 1) == 1;
-            SettingData.MusicEnable = PlayerPrefs.GetInt("Music", 1) == 1;
-            SettingData.VibrationEnable = PlayerPrefs.GetInt("Vibration", 1) == 1;
+            SettingData = new SettingData
+            {
+                SoundEnable = PlayerPrefs.GetInt("Sound", 1) == 1,
+                MusicEnable = PlayerPrefs.GetInt("Music", 1) == 1,
+                VibrationEnable = PlayerPrefs.GetInt("Vibration", 1) == 1
+            };
         }
 
         private void Save()

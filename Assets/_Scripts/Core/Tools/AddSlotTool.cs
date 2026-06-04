@@ -1,29 +1,29 @@
+using _Scripts.Core.Tile;
 using _Scripts.Data;
 using Utils;
 
 namespace _Scripts.Core.Tools
 {
-    public class AddSlotTool : IToolCommand
+    public class AddSlotTool : BaseToolCommand
     {
-        private ShellManager _shellManager;
-        private int _useLeft;
+        private readonly ShellManager _shellManager;
+        protected override ToolType ToolType =>ToolType.AddSlot;
 
-        public AddSlotTool(ShellManager shellManager, int useLeft)
+        public AddSlotTool(ShellManager shellManager, int useLeft):base(useLeft)
         {
             _shellManager = shellManager;
-            _useLeft = useLeft;
         }
-        public int UseLeft => _useLeft;
-        public void Execute()
+
+        public override void Execute()
         {
             if (!CanExecute()) return;
 
             _shellManager.AddSlot();
 
-            if (_useLeft > 0) _useLeft--;
-            TileEventBus.OnToolUsed?.Invoke(ToolType.AddSlot,_useLeft);
+            ComsumeUse();
         }
 
-        public bool CanExecute() => _shellManager != null && _useLeft > 0;
+        public override bool CanExecute() => _shellManager != null && _useLeft > 0;
+
     }
 }

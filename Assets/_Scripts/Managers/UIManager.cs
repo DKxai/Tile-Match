@@ -1,173 +1,83 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Net.Mime;
 using _Scripts.Data;
 using _Scripts.Systems;
-using _Scripts.UI;
 using _Scripts.UI.Settings;
-using _Scripts.UI.Store;
 using _Scripts.UI.Tools_Confirm;
-using TMPro;
+using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace _Scripts.Managers
 {
-    public class UIManager : Singleton<UIManager>
+    public abstract class UIManager : Singleton<UIManager>
     {
-        [Header("UI Buttons")] [SerializeField]
-        private Button currentLevelBtn;
+        [Header("Shared")]
+        [SerializeField] protected ConfirmPopup confirmPopup;
+        [SerializeField] protected List<ConfirmPopupDataMapping> confirmPopupDataMappings;
+        [SerializeField] protected SettingsPopup settingsPopup;
+        [SerializeField] private Button settingsButton;
 
-        [SerializeField] private Button settingsBtn;
-        [SerializeField] private Button coinsBtn;
-        [SerializeField] private Button storeBtn;
-        [SerializeField] private Button heartBtn;
-        [SerializeField] private Button adsBtn;
-
-
-        [SerializeField] private LevelNode[] nodes;
-
-        [SerializeField] private RectTransform content;
-        [SerializeField] private ScrollRect scrollRect;
-        private readonly string _preSceneName = "Level";
-        private int CurrentLevel => PlayerPrefs.GetInt("CurrentLevel", 1);
-
-        [SerializeField] private SettingsPopup settingsPopup;
-        [SerializeField] private StorePopup storePopup;
-
-        [SerializeField] private ConfirmPopup confirmPopup;
-
-
-        // [SerializeField] private HeartUI heartUI;
-        // [SerializeField] private AdsUI adsUI;
-        // [SerializeField] private WinUi winUI;
         protected override void Awake()
         {
             base.Awake();
-            RegisterEvents();
+            if (settingsButton != null)
+                settingsButton.onClick.AddListener(OnSettingsClicked);
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            UnregisterEvents();
+            if (settingsButton != null)
+                settingsButton.onClick.RemoveListener(OnSettingsClicked);
         }
 
-        private void Start()
+        // ---- Lõi tái dùng được cho mọi confirm popup ----
+        protected void ShowConfirmPopup(ConfirmPopupData data, Action onConfirm)
         {
-            for (int i = 0; i < nodes.Length; i++)
+            if (data == null)
             {
-                int levelIndex = i + 1;
-
-                if (levelIndex < CurrentLevel)
-                {
-                    nodes[i].SetState(LevelNode.State.Complete);
-                }
-                else if (levelIndex == CurrentLevel)
-                {
-                    nodes[i].SetState(LevelNode.State.Current);
-                }
-                else
-                {
-                    nodes[i].SetState(LevelNode.State.Locked);
-                }
-
-                nodes[i].Setup(levelIndex);
+                Debug.LogError("[UIManager] ConfirmPopupData is null.");
+                return;
             }
 
-
-            currentLevelBtn.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {CurrentLevel}";
+            confirmPopup.Setup(data.title, data.description, data.confirm,
+                data.icon, onConfirm, data.isDisplayCoinUi, data.isDisplayHeartUI);
+            confirmPopup.Show();
         }
 
-        #region Register & unregister  events
-
-        private void RegisterEvents()
+        // Handler cho sự kiện hết tool / quit
+        protected virtual void ConfirmPopupShow(OutOfToolUseEvent evt)
         {
-            currentLevelBtn.onClick.AddListener(CurrentLevelClicked);
-            settingsBtn.onClick.AddListener(OpenSettingsUI);
-            coinsBtn.onClick.AddListener(OpenStorePopup);
-            storeBtn.onClick.AddListener(OpenStorePopup);
-            // adsBtn.onClick.AddListener(OpenAdsUI);
-            // quitBtn.onClick.AddListener(CurrentLevelClicked);
+            ToolType toolType = evt.ToolType;
+            ConfirmPopupData data = GetConfirmPopupData(toolType);
+
+            Action action = toolType == ToolType.Quit
+                ? OnQuitConfirmed
+                : () => OnBuyConfirmed(toolType, data.cost, data.amount);
+
+            ShowConfirmPopup(data, action);
         }
 
-        private void UnregisterEvents()
+        protected ConfirmPopupData GetConfirmPopupData(ToolType toolType) =>
+            confirmPopupDataMappings.Find(x => x.type == toolType)?.data;
+
+        protected void OnSettingsClicked() => settingsPopup.Show();
+
+        private void OnBuyConfirmed(ToolType toolType, int cost, int amount)
         {
-            currentLevelBtn.onClick.RemoveListener(CurrentLevelClicked);
-            settingsBtn.onClick.RemoveListener(OpenSettingsUI);
-            coinsBtn.onClick.RemoveListener(OpenStorePopup);
-            storeBtn.onClick.RemoveListener(OpenStorePopup);
-            // adsBtn.onClick.RemoveListener(OpenAdsUI);
-            //quitBtn.onClick.RemoveListener(CurrentLevelClicked);
-        }
-
-        #endregion
-
-        private void CurrentLevelClicked()
-        {
-            ScrollToNode(nodes[CurrentLevel - 1].GetComponent<RectTransform>(), 1f);
-            StartCoroutine(LoadScene(_preSceneName + CurrentLevel));
-        }
-
-        private IEnumerator LoadScene(string sceneName)
-        {
-            yield return new WaitForSeconds(1f);
-            SceneLevelManager.Instance.LoadScene(_preSceneName + CurrentLevel);
-        }
-
-
-        #region Scrolling
-
-        private void ScrollToNode(RectTransform nodeRect, float duration)
-        {
-            StartCoroutine(ScrollToMiddle(nodeRect, duration));
-        }
-
-        private IEnumerator ScrollToMiddle(RectTransform nodeRect, float duration)
-        {
-            float contentHeight = content.rect.height;
-            float nodeLocalY = nodeRect.anchoredPosition.y;
-
-            float target = Mathf.Clamp01(nodeLocalY / contentHeight);
-            float start = scrollRect.verticalNormalizedPosition;
-            float elapse = 0f;
-
-            while (elapse < duration)
+            if (!CurrencyManager.Instance.HasEnoughCoins(cost))
             {
-                elapse += Time.deltaTime;
-                float t = elapse / duration;
-                t = t * t * (3f - 2f * t);
-                scrollRect.verticalNormalizedPosition = Mathf.Lerp(start, target, t);
-                yield return null;
+                EventBus.Publish(new NotEnoughCurrencyEvent());
+                return;
             }
+            EventBus.Publish(new PurchaseEvent(toolType, amount, cost));
         }
 
-        #endregion
-
-        #region Opening UI
-
-        private void Open(UIPopup popup)
+        private void OnQuitConfirmed()
         {
-            popup.Show();
+            HeartManager.Instance.SpendHeart();
+            SceneLevelManager.Instance.LoadScene("LevelMap");
+            Debug.Log("Quit");
         }
-
-        public void OpenSettingsUI() => Open(settingsPopup);
-
-        public void OpenStorePopup() => Open(storePopup);
-
-        // public void OpenHeartUI() => Open(heartUI);
-        // public void OpenQuitUI() => Open(quitUI);
-        // public void OpenWinUI() => Open(winUI);
-        // public void OpenToolsUI() => Open(toolsUI);
-        // public void OpenAdsUI() => Open(adsUI);
-
-        #endregion
-
-        public void Close(UIPopup popup)
-        {
-            popup.Hide();
-        }
-
     }
 }

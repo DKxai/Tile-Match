@@ -12,25 +12,24 @@ namespace _Scripts.Core.Tools
     /// but currently when spawn it check number of TileCell that not include in
     /// base Shell so that can invalid to random.
     /// </summary>
-    public class ShuffleTool : IToolCommand
+    public class ShuffleTool : BaseToolCommand
     {
-        private GridSpawner _gridSpawner;
-        private int _useLeft;
+        private readonly GridSpawner _gridSpawner;
+        protected override ToolType ToolType => ToolType.Shuffle;
 
-        public ShuffleTool(GridSpawner gridSpawner, int useLeft)
+        public ShuffleTool(GridSpawner gridSpawner, int useLeft):base(useLeft)
         {
             _gridSpawner = gridSpawner;
-            _useLeft = useLeft;
         }
 
-        public bool CanExecute()
+        public override bool CanExecute()
         {
             return _useLeft > 0 && _gridSpawner != null;
         }
 
-        public int UseLeft => _useLeft;
 
-        public void Execute()
+
+        public override void Execute()
         {
             if (!CanExecute())
                 return;
@@ -58,8 +57,7 @@ namespace _Scripts.Core.Tools
                 tile.MoveToWorldPosition(tile.worldPos);
             }
             _gridSpawner.RefreshAllCells(_gridSpawner.CurrentGrid);
-            if (_useLeft > 0) _useLeft--;
-            TileEventBus.OnToolUsed?.Invoke(ToolType.Shuffle, _useLeft);
+            ComsumeUse();
         }
     }
 }
