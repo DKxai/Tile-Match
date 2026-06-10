@@ -579,7 +579,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 3368356752135232585}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

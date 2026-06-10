@@ -1,8 +1,10 @@
+using _Scripts.Core.Tile;
+using _Scripts.Data.Sounds;
+using _Scripts.Systems;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Utils;
 
 namespace _Scripts.Managers
 {
@@ -39,6 +41,7 @@ namespace _Scripts.Managers
                 _lastClickTime = Time.time;
                 clickedTile.IsClicked = true;
                 hit.collider.enabled = false;
+                EventBus.Publish(new PlaySoundEvent(SoundType.TileSound));
                 EventBus.Publish(new TileClickEvent(clickedTile));
             }
         }

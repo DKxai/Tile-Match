@@ -138,7 +138,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4cf242e898cd4164badf005e8e4fa88f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 719cdfb4d26ac5141b9371fe3a0c85af, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -400,8 +400,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 11c2afc1e50d3fdbebf056def402db2b, type: 2}
+  m_sharedMaterial: {fileID: -4247538562184874824, guid: 11c2afc1e50d3fdbebf056def402db2b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -425,7 +425,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 65.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -555,6 +555,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4164857015694625079, guid: 8630a985c18a0708886bb6669c5e6d15, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: dcd7ad822e74ca64186c83d9e2dcb940, type: 3}
     - target: {fileID: 6803792814094326224, guid: 8630a985c18a0708886bb6669c5e6d15, type: 3}
       propertyPath: m_Name
       value: Settings

@@ -1,60 +1,52 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using _Scripts.Managers;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class TileSpawner : MonoBehaviour
+namespace _Scripts.Core.Tile
 {
-    [SerializeField] List<TileModel> tiles;
-    [SerializeField] List<TileCell> cells = new List<TileCell>();
-    private TileCell[] _tileCells;
-    private bool _isValidNumberOfTileCell = false;
-    private int _cellCounter;
-
-    public void Init()
+    public class TileSpawner : MonoBehaviour
     {
-        _tileCells = GetComponentsInChildren<TileCell>();
+        [SerializeField] private List<TileModel> tiles;
+        private List<TileCell> _cells = new List<TileCell>();
+        private bool _isValidNumberOfTileCell = false;
+        private int _cellCounter;
 
-        cells = new List<TileCell>(_tileCells);
-
-        _isValidNumberOfTileCell = CheckNumberOfTileCell();
-        if (!_isValidNumberOfTileCell) return;
-
-        RandomSystem(cells);
-    }
-
-    private bool CheckNumberOfTileCell()
-    {
-        _cellCounter = cells.Count;
-        if (_cellCounter < 3 || _cellCounter % 3 != 0)
+        public void Init()
         {
-            // Debug.Log("[TileSpawner] Invalid tile cell numbers.");
-            return false;
+            _cells = new List<TileCell>(GetComponentsInChildren<TileCell>());
+
+            _isValidNumberOfTileCell = CheckNumberOfTileCell();
+            if (!_isValidNumberOfTileCell) return;
+
+            RandomSystem(_cells);
         }
 
-        return true;
-    }
-
-    public void RandomSystem(List<TileCell> tileCells)
-    {
-        int randomTimes = _cellCounter / 3;
-
-        for (int i = 0; i < randomTimes; i++)
+        private bool CheckNumberOfTileCell()
         {
-            int randomTile = Random.Range(0, tiles.Count);
-            for (int x = 0; x < 3; x++)
+            _cellCounter = _cells.Count;
+            if (_cellCounter < 3 || _cellCounter % 3 != 0) return false;
+
+            return true;
+        }
+
+        public void RandomSystem(List<TileCell> tileCells)
+        {
+            int cellGroupNums = _cellCounter / 3;
+
+            for (int i = 0; i < cellGroupNums; i++)
             {
-                int randomCell = Random.Range(0, cells.Count);
-                cells[randomCell].iconSprite.GetComponent<SpriteRenderer>().sprite = tiles[randomTile].iconSprite;
-                cells[randomCell].ID = tiles[randomTile].id;
-                // Debug.Log(
-                //     $"[TileSpawner] {cells[randomCell].gameObject.name} Added icon sprite with ID {cells[randomCell].ID}.");
-                //
-                // Debug.Log($"[TileSpawner] remove {cells[randomCell].gameObject.name}th from List.");
-                cells.Remove(cells[randomCell]);
-                //Debug.Log($"[TileSpawner] {cells.Count} remaining cells in List.");
+                int randomTile = Random.Range(0, tiles.Count);
+                for (int x = 0; x < 3; x++)
+                {
+                    int randomCell = Random.Range(0, _cells.Count);
+                    _cells[randomCell].iconSprite.GetComponent<SpriteRenderer>().sprite = tiles[randomTile].iconSprite;
+                    _cells[randomCell].ID = tiles[randomTile].id;
+                    _cells.Remove(_cells[randomCell]);
+                }
             }
+
+            ShellManager.Instance.InitGroupCount(cellGroupNums);
         }
     }
 }

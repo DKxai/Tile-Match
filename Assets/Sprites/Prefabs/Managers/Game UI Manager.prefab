@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7574886786584103791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1336021741372994247}
+  - component: {fileID: 7532867007377460972}
+  m_Layer: 0
+  m_Name: Game UI Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1336021741372994247
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7574886786584103791}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7532867007377460972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7574886786584103791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca0b7b6dd94471a98c9b258501fe950, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  confirmPopup: {fileID: 0}
+  confirmPopupDataMappings:
+  - type: 0
+    data:
+      title: ef
+      description: sf
+      icon: {fileID: 21300000, guid: 579078a9250b1b7a3b8da637b21b6917, type: 3}
+      confirm: Buy
+      cost: 100
+      amount: 3
+      isDisplayCoinUi: 1
+      isDisplayHeartUI: 0
+  - type: 3
+    data:
+      title: sf
+      description: sfsf
+      icon: {fileID: 21300000, guid: ef4c0698cb9bd3af496b2e6500adaad8, type: 3}
+      confirm: Buy
+      cost: 100
+      amount: 5
+      isDisplayCoinUi: 1
+      isDisplayHeartUI: 0
+  - type: 5
+    data:
+      title: sfd
+      description: dfs
+      icon: {fileID: 21300000, guid: cc41a650f8dfc2f4fabd2242a263b131, type: 3}
+      confirm: Buy
+      cost: 100
+      amount: 5
+      isDisplayCoinUi: 1
+      isDisplayHeartUI: 0
+  - type: 6
+    data:
+      title: Quit
+      description: You will lose the life!
+      icon: {fileID: 21300000, guid: 43606eb539f308a45831ab3a9c443f7e, type: 3}
+      confirm: Quit
+      cost: 0
+      amount: 1
+      isDisplayCoinUi: 0
+      isDisplayHeartUI: 1
+  settingsPopup: {fileID: 0}
+  settingsButton: {fileID: 0}
+  homeButton: {fileID: 0}
+  titleText: {fileID: 0}
+  _endingData:
+  - EndingType: 0
+    EndingInfo:
+      Image: {fileID: 21300000, guid: f918a3b109cb569b78d57e2fb0cc2da9, type: 3}
+      EndingText: Sucess
+      RText: Continue
+      LText: Quit
+      MainPanelColor: {r: 0, g: 0.654902, b: 0.77254903, a: 1}
+      HaveCoinsStack: 1
+      IsNeedCoinsUI: 1
+  - EndingType: 1
+    EndingInfo:
+      Image: {fileID: 21300000, guid: fda4a1ee48a3d4348a2e0d84d21f506b, type: 3}
+      EndingText: Failed
+      RText: Quit
+      LText: Retry
+      MainPanelColor: {r: 0.36078432, g: 0.5254902, b: 0.5568628, a: 1}
+      HaveCoinsStack: 0
+      IsNeedCoinsUI: 0
+  _endingUI: {fileID: 0}

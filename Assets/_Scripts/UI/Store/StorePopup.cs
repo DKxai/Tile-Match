@@ -9,13 +9,8 @@ using UnityEngine.UI;
 
 namespace _Scripts.UI.Store
 {
-    public class StorePopup : UIPopup
+    public sealed class StorePopup : UIPopup
     {
-        [Header("Animation")] [SerializeField] private RectTransform panel;
-        [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private float showDuration;
-        [SerializeField] private float hideDuration;
-
         [Header("Buttons")] [SerializeField] private Button closeButton;
 
         [Header("Store")] [SerializeField] private StoreItemUI itemPrefab;
@@ -24,12 +19,13 @@ namespace _Scripts.UI.Store
         private readonly List<StoreItemUI> _spawnedItems = new();
 
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             closeButton.onClick.AddListener(Hide);
         }
 
-        protected virtual void OnDestroy()
+        private void OnDestroy()
         {
             closeButton.onClick.RemoveListener(Hide);
         }
@@ -37,8 +33,9 @@ namespace _Scripts.UI.Store
        
         public override void Show()
         {
-            base.Show();
+            gameObject.SetActive(true);
             RefreshStore();
+            PlayShowAnimation();
         }
 
         private void RefreshStore()
@@ -69,7 +66,11 @@ namespace _Scripts.UI.Store
         private void BuyItem(StoreItemData data)
         {
             bool sucess = StoreManager.Instance.Buy(data);
-            if (sucess) Debug.Log("Purchased successfully");
+            if (sucess)
+            {
+                Debug.Log("Purchased successfully");
+                
+            }
             else Debug.LogError("Purchased failed");
         }
 
@@ -90,13 +91,31 @@ namespace _Scripts.UI.Store
             panel.DOKill();
             canvasGroup.DOKill();
 
-            panel.localScale = Vector3.zero;
-            canvasGroup.alpha = 0f;
+            canvasGroup.alpha = 1f; 
+            panel.localScale = Vector3.one;
 
-            canvasGroup.DOFade(1f, showDuration);
-            panel.DOScale(1f, showDuration).SetEase(Ease.OutBack);
+            int childCount = content.childCount;
+            float stagger = 0.05f;
+
+            for (int i = 0; i < childCount; i++)
+            {
+                RectTransform row = content.GetChild(i) as RectTransform;
+                if (row == null) continue;
+
+                row.localScale = Vector3.zero;
+
+                CanvasGroup rowCG = row.GetComponent<CanvasGroup>();
+                if (rowCG == null) rowCG = row.gameObject.AddComponent<CanvasGroup>();
+                rowCG.alpha = 0f;
+
+                row.DOScale(Vector3.one, 0.35f)
+                    .SetEase(Ease.OutBack)
+                    .SetDelay(i * stagger);
+
+                rowCG.DOFade(1f, 0.2f)
+                    .SetDelay(i * stagger);
+            }
         }
-
         protected override void PlayHideAnimation()
         {
             panel.DOKill();

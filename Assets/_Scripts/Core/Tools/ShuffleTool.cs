@@ -1,7 +1,8 @@
 using System;
+using _Scripts.Core.Grid;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
 using UnityEngine;
-using Utils;
 using Random = UnityEngine.Random;
 
 namespace _Scripts.Core.Tools
@@ -17,14 +18,14 @@ namespace _Scripts.Core.Tools
         private readonly GridSpawner _gridSpawner;
         protected override ToolType ToolType => ToolType.Shuffle;
 
-        public ShuffleTool(GridSpawner gridSpawner, int useLeft):base(useLeft)
+        public ShuffleTool(GridSpawner gridSpawner, int useLeft, int useLeftInALevel) : base(useLeft, useLeftInALevel)
         {
             _gridSpawner = gridSpawner;
         }
 
         public override bool CanExecute()
         {
-            return _useLeft > 0 && _gridSpawner != null;
+            return _useLeft > 0 && _gridSpawner != null && _useLeftInALevel > 0;
         }
 
 

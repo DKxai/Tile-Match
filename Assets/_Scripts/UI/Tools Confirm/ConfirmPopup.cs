@@ -9,6 +9,7 @@ namespace _Scripts.UI.Tools_Confirm
     {
         [SerializeField] private TMP_Text titleText;
         [SerializeField] private TMP_Text descriptionText;
+        [SerializeField] private TMP_Text amounText;
         [SerializeField] private Image icon;
         [SerializeField] private Button confirmButton;
         [SerializeField] private TMP_Text confirmText;
@@ -17,10 +18,12 @@ namespace _Scripts.UI.Tools_Confirm
         [SerializeField] private HeartUI heartUI;
         private Action _onConfirm;
 
-        public void Setup(string title, string description,string confirm, Sprite sprite, Action onConfirm, bool isDisplayCoinUI,bool isDisplayHeartUI)
+        public void Setup(string title, string description, int amount, string confirm, Sprite sprite, Action onConfirm,
+            bool isDisplayCoinUI, bool isDisplayHeartUI)
         {
             titleText.text = title;
             descriptionText.text = description;
+            amounText.text = $"x{amount}";
             icon.sprite = sprite;
             confirmText.text = confirm;
             _onConfirm = onConfirm;
@@ -36,16 +39,6 @@ namespace _Scripts.UI.Tools_Confirm
         {
             confirmButton.onClick.RemoveAllListeners();
             closeButton.onClick.RemoveAllListeners();
-        }
-
-        public override void Show()
-        {
-            base.Show();
-        }
-
-        protected override void PlayHideAnimation()
-        {
-            base.PlayHideAnimation();
         }
     }
 }

@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1b5054adff10ae2ddb43a3891ba57969, type: 2}
+  m_sharedMaterial: {fileID: -6109061927259885021, guid: 1b5054adff10ae2ddb43a3891ba57969, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 50
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -128,7 +128,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 4.4, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -269,5 +269,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  currentColor: {r: 1, g: 0.8, b: 0, a: 1}
+  currentColor: {r: 0.23137255, g: 0.32156864, b: 0.8235294, a: 1}
   completeColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}

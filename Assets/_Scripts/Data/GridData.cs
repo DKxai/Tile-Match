@@ -1,11 +1,14 @@
 using System;
 
-[Serializable]
-public class GridData
+namespace _Scripts.Data
 {
-   public int level;
-   public int width;
-   public int height;
-   public int layers;
-   public int[] data;
+   [Serializable]
+   public class GridData
+   {
+      public int level;
+      public int width;
+      public int height;
+      public int layers;
+      public int[] data;
+   }
 }

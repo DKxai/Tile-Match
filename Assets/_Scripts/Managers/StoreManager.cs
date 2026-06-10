@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
+using _Scripts.SaveSystem;
 using _Scripts.UI.Store;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
 using UnityEngine;
-using Utils;
 
 namespace _Scripts.Managers
 {
@@ -54,25 +55,16 @@ namespace _Scripts.Managers
                     CurrencyManager.Instance.AddCoins(item.RewardAmount);
                     break;
                 case StoreItemType.Combo:
-                    BuyToolUses(new PurchaseEvent(ToolType.AddSlot,item.RewardAmount,0));
-                    BuyToolUses(new PurchaseEvent(ToolType.Return,item.RewardAmount,0));
-                    BuyToolUses(new PurchaseEvent(ToolType.Shuffle,item.RewardAmount,0));
+                    DataSystem.SaveToolUse(ToolType.AddSlot,
+                        DataSystem.LoadToolUse(ToolType.AddSlot) + item.RewardAmount);
+                    DataSystem.SaveToolUse(ToolType.Shuffle,
+                        DataSystem.LoadToolUse(ToolType.Shuffle) + item.RewardAmount);
+                    DataSystem.SaveToolUse(ToolType.Return,
+                        DataSystem.LoadToolUse(ToolType.Return) + item.RewardAmount);
                     break;
             }
 
-            Debug.Log($"Buying item {item}");
             return true;
-        }
-
-        private void BuyToolUses(PurchaseEvent evt)
-        {
-            if (!CurrencyManager.Instance.HasEnoughCoins(evt.Cost))
-            {
-                EventBus.Publish(new NotEnoughCurrencyEvent());
-                return;
-            }
-
-            ToolManager.Instance.AddUse(evt);
         }
 
         public void ShowStore()

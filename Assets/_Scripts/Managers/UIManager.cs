@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
 using _Scripts.Systems;
 using _Scripts.UI.Settings;
 using _Scripts.UI.Tools_Confirm;
@@ -31,7 +32,6 @@ namespace _Scripts.Managers
                 settingsButton.onClick.RemoveListener(OnSettingsClicked);
         }
 
-        // ---- Lõi tái dùng được cho mọi confirm popup ----
         protected void ShowConfirmPopup(ConfirmPopupData data, Action onConfirm)
         {
             if (data == null)
@@ -40,12 +40,11 @@ namespace _Scripts.Managers
                 return;
             }
 
-            confirmPopup.Setup(data.title, data.description, data.confirm,
+            confirmPopup.Setup(data.title, data.description,data.amount, data.confirm,
                 data.icon, onConfirm, data.isDisplayCoinUi, data.isDisplayHeartUI);
             confirmPopup.Show();
         }
 
-        // Handler cho sự kiện hết tool / quit
         protected virtual void ConfirmPopupShow(OutOfToolUseEvent evt)
         {
             ToolType toolType = evt.ToolType;
@@ -58,10 +57,10 @@ namespace _Scripts.Managers
             ShowConfirmPopup(data, action);
         }
 
-        protected ConfirmPopupData GetConfirmPopupData(ToolType toolType) =>
+        private ConfirmPopupData GetConfirmPopupData(ToolType toolType) =>
             confirmPopupDataMappings.Find(x => x.type == toolType)?.data;
 
-        protected void OnSettingsClicked() => settingsPopup.Show();
+        private void OnSettingsClicked() => settingsPopup.Show();
 
         private void OnBuyConfirmed(ToolType toolType, int cost, int amount)
         {
@@ -75,8 +74,7 @@ namespace _Scripts.Managers
 
         private void OnQuitConfirmed()
         {
-            HeartManager.Instance.SpendHeart();
-            SceneLevelManager.Instance.LoadScene("LevelMap");
+            EventBus.Publish(new LoadSceneEvent(SceneType.MapScene));
             Debug.Log("Quit");
         }
     }

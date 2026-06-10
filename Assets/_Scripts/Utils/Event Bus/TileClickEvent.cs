@@ -1,3 +1,5 @@
+using _Scripts.Core.Tile;
+
 namespace _Scripts.Utils.Event_Bus
 {
     public struct TileClickEvent

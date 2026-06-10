@@ -1,19 +1,21 @@
 using _Scripts.Data;
+using _Scripts.Data.Tool;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
-using Utils;
 
 namespace _Scripts.Core.Tools
 {
     public abstract class BaseToolCommand : IToolCommand
     {
         protected int _useLeft;
+        protected int _useLeftInALevel;
         public int UseLeft => _useLeft;
         protected abstract ToolType ToolType { get; }
 
-        protected BaseToolCommand(int useLeft)
+        protected BaseToolCommand(int useLeft,int  useLeftInALevel)
         {
             _useLeft = useLeft;
+            _useLeftInALevel = useLeftInALevel;
         }
 
         public abstract void Execute();
@@ -35,6 +37,7 @@ namespace _Scripts.Core.Tools
             if (_useLeft > 0)
             {
                 _useLeft--;
+                _useLeftInALevel--;
               EventBus.Publish(new ToolUseChangeEvent(ToolType, _useLeft));
             }
         }

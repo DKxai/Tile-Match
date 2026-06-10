@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using _Scripts.Core.Tile;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
+using _Scripts.Managers;
 using DG.Tweening;
 using UnityEngine;
-using Utils;
 
 namespace _Scripts.Core.Tools
 {
@@ -15,7 +16,7 @@ namespace _Scripts.Core.Tools
         private List<TileCell> _returnTiles = new List<TileCell>(3);
         
         protected override ToolType ToolType => ToolType.Return;
-        public ReturnTool(ShellManager shellManager, int useLeft):base(useLeft)
+        public ReturnTool(ShellManager shellManager, int useLeft, int useLeftInALevel) : base(useLeft, useLeftInALevel)
         {
             _shellManager = shellManager;
         }
@@ -46,6 +47,6 @@ namespace _Scripts.Core.Tools
           ComsumeUse();
         }
 
-        public override bool CanExecute() => _shellManager != null && _useLeft > 0;
+        public override bool CanExecute() => _shellManager != null && _useLeft > 0 && _useLeftInALevel > 0;
     }
 }

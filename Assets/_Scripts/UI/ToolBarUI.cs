@@ -1,13 +1,14 @@
 using System;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
 using _Scripts.Managers;
+using _Scripts.SaveSystem;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
 using Grid_Map;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace _Scripts.UI
 {
@@ -45,9 +46,9 @@ namespace _Scripts.UI
 
         private void UpdateTextButton()
         {
-            shuffleText.text = ToolManager.Instance.toolData.shuffleUseLeft.ToString();
-            addSlotText.text = ToolManager.Instance.toolData.addSlotUseLeft.ToString();
-            returnText.text = ToolManager.Instance.toolData.returnUseLeft.ToString();
+            shuffleText.text = DataSystem.LoadToolUse(ToolType.Shuffle).ToString();
+            addSlotText.text = DataSystem.LoadToolUse(ToolType.AddSlot).ToString();
+            returnText.text = DataSystem.LoadToolUse(ToolType.Return).ToString();
         }
 
         void Init()

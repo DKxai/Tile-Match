@@ -1,9 +1,10 @@
+using _Scripts.Data;
+using _Scripts.SaveSystem;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace _Scripts.UI
 {
@@ -95,11 +96,9 @@ namespace _Scripts.UI
 
         private void OnClicked()
         {
-            Debug.Log($"Clicked Level {_levelIndex}");
-
-            PlayerPrefs.SetInt("SelectedLevel", _levelIndex);
-            string level = "Level" + _levelIndex;
-            EventBus.Publish(new LevelSelectEvent(level));
+            DataSystem.SaveSelectedLevel(_levelIndex);
+            // TODO:    .....
+            EventBus.Publish(new LoadSceneEvent(SceneType.GameScene));
         }
     }
 }

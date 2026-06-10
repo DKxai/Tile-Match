@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using _Scripts.Core.Grid;
 using _Scripts.Managers;
 using UnityEngine;
 using Grid_Map;
@@ -30,7 +31,7 @@ public class LevelEditorInput : MonoBehaviour
             Vector3 worldPos = ray.GetPoint(distance);
             Vector3 localPos = worldPos - gridView.transform.position;
 
-            int currentLayer = gridView.currentLayer;
+            int currentLayer = gridView.CurrentLayer;
             float cellSize = gridView.CellSize;
 
             GetXY(localPos, currentLayer, cellSize, out int x, out int y);

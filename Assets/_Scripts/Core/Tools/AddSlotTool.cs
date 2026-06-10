@@ -1,15 +1,16 @@
 using _Scripts.Core.Tile;
 using _Scripts.Data;
-using Utils;
+using _Scripts.Data.Tool;
+using _Scripts.Managers;
 
 namespace _Scripts.Core.Tools
 {
     public class AddSlotTool : BaseToolCommand
     {
         private readonly ShellManager _shellManager;
-        protected override ToolType ToolType =>ToolType.AddSlot;
+        protected override ToolType ToolType => ToolType.AddSlot;
 
-        public AddSlotTool(ShellManager shellManager, int useLeft):base(useLeft)
+        public AddSlotTool(ShellManager shellManager, int useLeft, int useLeftInALevel) : base(useLeft, useLeftInALevel)
         {
             _shellManager = shellManager;
         }
@@ -23,7 +24,6 @@ namespace _Scripts.Core.Tools
             ComsumeUse();
         }
 
-        public override bool CanExecute() => _shellManager != null && _useLeft > 0;
-
+        public override bool CanExecute() => _shellManager != null && _useLeft > 0 && _useLeftInALevel > 0;
     }
 }

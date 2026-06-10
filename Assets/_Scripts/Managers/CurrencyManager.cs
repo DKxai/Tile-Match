@@ -1,5 +1,7 @@
 using System;
 using _Scripts.Data;
+using _Scripts.Data.Sounds;
+using _Scripts.SaveSystem;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
 using UnityEngine;
@@ -10,7 +12,6 @@ namespace _Scripts.Managers
     {
         public int Coins { get; private set; }
 
-        private DataSystem _dataSystem;
 
         // Custom event accessor: bất kỳ CoinUI nào subscribe đều nhận giá trị hiện tại ngay lập tức
         private Action<int> _onCoinsChanged;
@@ -38,14 +39,14 @@ namespace _Scripts.Managers
         protected override void Awake()
         {
             base.Awake();
-            _dataSystem = new DataSystem();
-            Coins = _dataSystem.LoadCoins();
+            Coins = DataSystem.LoadCoins();
         }
 
         public bool HasEnoughCoins(int cost) => Coins >= cost;
 
         public void AddCoins(int amount)
         {
+            EventBus.Publish(new PlaySoundEvent(SoundType.AcheivementSound));
             Coins += amount;
             Save();
         }
@@ -60,13 +61,14 @@ namespace _Scripts.Managers
             }
 
             Coins -= cost;
+            EventBus.Publish(new PlaySoundEvent(SoundType.AcheivementSound));
             Save();
         }
 
         private void Save()
         {
-            _dataSystem.SaveCoins(Coins);
-            _onCoinsChanged?.Invoke(Coins); // dùng backing field, không dùng event trực tiếp
+            DataSystem.SaveCoins(Coins);
+            _onCoinsChanged?.Invoke(Coins);
         }
     }
 }

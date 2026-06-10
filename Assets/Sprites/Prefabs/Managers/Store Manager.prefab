@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7805908148605636942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8494663565580298499}
+  - component: {fileID: 6126046657827651637}
+  m_Layer: 0
+  m_Name: Store Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8494663565580298499
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805908148605636942}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6126046657827651637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805908148605636942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c26232896bb147e68b08fc238e63fd35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  storePopupPrefab: {fileID: 6443347577827282070, guid: 2919f1315254d9dc8a4eb4afa2b3c524, type: 3}
+  persistentUIRoot: {fileID: 0}
+  items:
+  - Id: 1
+    Type: 0
+    Icons:
+    - {fileID: 21300000, guid: ef4c0698cb9bd3af496b2e6500adaad8, type: 3}
+    - {fileID: 21300000, guid: f78b26206d1158514a350965ce9f13d8, type: 3}
+    - {fileID: 21300000, guid: 579078a9250b1b7a3b8da637b21b6917, type: 3}
+    Price: 100
+    RewardAmount: 5
+  - Id: 2
+    Type: 2
+    Icons:
+    - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
+    Price: 100
+    RewardAmount: 200
+  - Id: 3
+    Type: 2
+    Icons:
+    - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
+    Price: 100
+    RewardAmount: 500
+  - Id: 4
+    Type: 2
+    Icons:
+    - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
+    Price: 300
+    RewardAmount: 1000

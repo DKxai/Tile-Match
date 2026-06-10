@@ -1,15 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace CartoonUI
+namespace Sprites.Units.Cartoon_UI.Script
 {
     public class Close : MonoBehaviour
     {
-        public GameObject gameObject;
-        public void close()
+        public GameObject CloseObject;
+        public void CloseFunc()
         {
-            gameObject.SetActive(false);
+            CloseObject.SetActive(false);
         }
     }
 }

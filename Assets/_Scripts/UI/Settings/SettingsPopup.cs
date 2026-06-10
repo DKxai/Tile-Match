@@ -3,122 +3,88 @@ using _Scripts.Managers;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace _Scripts.UI.Settings
 {
-    public class SettingsPopup : UIPopup
+    public sealed class SettingsPopup : UIPopup
     {
-        [Header("Animation")] [SerializeField] private RectTransform panel;
-        [SerializeField] private CanvasGroup canvasGroup;
-
-        [SerializeField] private float hiddenY = -100f;
-
-        [SerializeField] private float showDuration = 0.35f;
-        [SerializeField] private float hideDuration = 0.35f;
-
-        private Vector2 _shownPosition;
-
-        [Header("Toggles")] [SerializeField] private Toggle musicToggle;
-        [SerializeField] private Toggle soundToggle;
-        [SerializeField] private Toggle vibrationToggle;
+        [Header("Toggles")] [SerializeField] private Slider musicSlider;
+        [SerializeField] private Slider soundSlider;
+        [SerializeField] private SwitchToggle vibrationToggle;
 
         [Header("Close")] [SerializeField] private Button closeButton;
 
-        protected virtual void Awake()
-        {
-            _shownPosition = panel.anchoredPosition;
-            RegisterEvents();
-        }
 
-        protected virtual void OnDestroy()
+        protected override void Awake()
         {
-            UnregisterEvents();
+            base.Awake();
+            vibrationToggle.Init();
         }
 
         private void Start()
         {
             LoadUI();
+            IsInitialized = true;
         }
+
+        private void OnEnable()
+        {
+            if (IsInitialized)
+                LoadUI();
+
+            if (SettingsManager.Instance != null)
+                RegisterEvents();
+        }
+
+        private void OnDisable()
+        {
+            if (SettingsManager.Instance != null)
+                UnregisterEvents();
+        }
+
 
         private void LoadUI()
         {
-            var data = SettingsManager.Instance.SettingData;
+            var m = SettingsManager.Instance;
+            if (m == null) return;
 
-            musicToggle.SetIsOnWithoutNotify(data.MusicEnable);
-            soundToggle.SetIsOnWithoutNotify(data.SoundEnable);
-            vibrationToggle.SetIsOnWithoutNotify(data.VibrationEnable);
+            musicSlider.SetValueWithoutNotify(m.MusicValue);
+            soundSlider.SetValueWithoutNotify(m.SoundValue);
+            vibrationToggle.SetOnWithoutNotify(m.VibrationEnable);
+        }
+
+        private void SyncVibrationToggle(bool value)
+        {
+            vibrationToggle.SetOnWithoutNotify(value);
         }
 
 
-        #region Register & Unregister Events
-
         private void RegisterEvents()
         {
-            musicToggle.onValueChanged.AddListener(OnMusicChanged);
-            soundToggle.onValueChanged.AddListener(OnSoundChanged);
-            vibrationToggle.onValueChanged.AddListener(OnVibrationChanged);
+            musicSlider.onValueChanged.AddListener(OnMusicChanged);
+            soundSlider.onValueChanged.AddListener(OnSoundChanged);
+            vibrationToggle.Toggle.onValueChanged.AddListener(OnVibrationChanged);
             closeButton.onClick.AddListener(Hide);
+            SettingsManager.Instance.OnVibrationChanged += SyncVibrationToggle;
         }
 
         private void UnregisterEvents()
         {
-            musicToggle.onValueChanged.RemoveListener(OnMusicChanged);
-            soundToggle.onValueChanged.RemoveListener(OnSoundChanged);
-            vibrationToggle.onValueChanged.RemoveListener(OnVibrationChanged);
-
+            musicSlider.onValueChanged.RemoveListener(OnMusicChanged);
+            soundSlider.onValueChanged.RemoveListener(OnSoundChanged);
+            vibrationToggle.Toggle.onValueChanged.RemoveListener(OnVibrationChanged);
             closeButton.onClick.RemoveListener(Hide);
+            SettingsManager.Instance.OnVibrationChanged -= SyncVibrationToggle;
         }
 
-        #endregion
 
-        #region Event Handlers
-
-        private void OnMusicChanged(bool value)
-        {
-            SettingsManager.Instance.SetMusic(value);
-        }
-
-        private void OnSoundChanged(bool value)
-        {
-            SettingsManager.Instance.SetSound(value);
-        }
+        private void OnMusicChanged(float value) => SettingsManager.Instance.SetMusic(value);
+        private void OnSoundChanged(float value) => SettingsManager.Instance.SetSound(value);
 
         private void OnVibrationChanged(bool value)
         {
             SettingsManager.Instance.SetVibration(value);
+            if (value) Handheld.Vibrate();
         }
-        
-
-        #endregion
-
-        #region Animation
-
-        protected override void PlayShowAnimation()
-        {
-            panel.DOKill();
-            canvasGroup.DOKill();
-
-            canvasGroup.alpha = 0f;
-
-            panel.anchoredPosition = new Vector2(_shownPosition.x, hiddenY);
-
-            canvasGroup.DOFade(1f, showDuration);
-
-            panel.DOAnchorPos(_shownPosition, showDuration).SetEase(Ease.OutBack);
-        }
-
-        protected override void PlayHideAnimation()
-        {
-            panel.DOKill();
-            canvasGroup.DOKill();
-            canvasGroup.alpha = 1f;
-
-            canvasGroup.DOFade(0f, hideDuration);
-            panel.DOAnchorPosY(hiddenY, hideDuration).SetEase(Ease.InBack)
-                .OnComplete(() => { gameObject.SetActive(false); });
-        }
-
-        #endregion
     }
 }

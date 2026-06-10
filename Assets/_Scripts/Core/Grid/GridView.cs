@@ -1,9 +1,7 @@
+using Grid_Map;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace Grid_Map
+namespace _Scripts.Core.Grid
 {
     public class GridView : MonoBehaviour
     {
@@ -19,8 +17,8 @@ namespace Grid_Map
         [SerializeField] UnityEngine.UI.Slider slider;
 
         private TileGrid _tileGrid;
-        private bool[] layerVisible;
-        public int currentLayer { get; private set; }
+        private bool[] _layerVisible;
+        public int CurrentLayer { get; private set; }
         public float CellSize => cellSize;
         public int GetLayerWidth(int z)  => z % 2 == 0 ? width + 1 : width;
         public int GetLayerHeight(int z) => z % 2 == 0 ? height + 1 : height;
@@ -47,9 +45,9 @@ namespace Grid_Map
             height = grid.GetHeight() - 1;
             layer  = grid.GetLayers();
 
-            layerVisible = new bool[layer];
+            _layerVisible = new bool[layer];
             for (int i = 0; i < layer; i++)
-                layerVisible[i] = true;
+                _layerVisible[i] = true;
 
             if (slider != null)
             {
@@ -59,26 +57,26 @@ namespace Grid_Map
                 slider.value = layer - 1;
             }
 
-            currentLayer = layer - 1;
+            CurrentLayer = layer - 1;
             UpdateLayerVisibility();
         }
 
         private void OnLayerChanged(float value)
         {
-            currentLayer = (int)value;
+            CurrentLayer = (int)value;
             UpdateLayerVisibility();
         }
 
         void UpdateLayerVisibility()
         {
-            if (layerVisible == null) return;
-            for (int i = 0; i < layerVisible.Length; i++)
-                layerVisible[i] = false;
+            if (_layerVisible == null) return;
+            for (int i = 0; i < _layerVisible.Length; i++)
+                _layerVisible[i] = false;
 
-            if (currentLayer < layerVisible.Length)
-                layerVisible[currentLayer] = true;
-            if (currentLayer - 1 >= 0 && currentLayer - 1 < layerVisible.Length)
-                layerVisible[currentLayer - 1] = true;
+            if (CurrentLayer < _layerVisible.Length)
+                _layerVisible[CurrentLayer] = true;
+            if (CurrentLayer - 1 >= 0 && CurrentLayer - 1 < _layerVisible.Length)
+                _layerVisible[CurrentLayer - 1] = true;
         }
 
 #if UNITY_EDITOR
@@ -95,10 +93,10 @@ namespace Grid_Map
             int totalLayers = _tileGrid.Layers;
             for (int z = 0; z < totalLayers; z++)
             {
-                if (layerVisible == null || z >= layerVisible.Length || !layerVisible[z]) continue;
+                if (_layerVisible == null || z >= _layerVisible.Length || !_layerVisible[z]) continue;
 
                 Color c = GetLayerColor(z);
-                c.a = (z == currentLayer) ? 1f : 0.6f;
+                c.a = (z == CurrentLayer) ? 1f : 0.6f;
                 style.normal.textColor = c;
 
                 int lw = GetLayerWidth(z);
@@ -133,10 +131,10 @@ namespace Grid_Map
 
             for (int z = 0; z < totalLayers; z++)
             {
-                if (layerVisible == null || z >= layerVisible.Length || !layerVisible[z]) continue;
+                if (_layerVisible == null || z >= _layerVisible.Length || !_layerVisible[z]) continue;
 
                 Color c = GetLayerColor(z);
-                c.a = (z == currentLayer) ? 1f : 0.6f;
+                c.a = (z == CurrentLayer) ? 1f : 0.6f;
                 Gizmos.color = c;
 
                 int lw = GetLayerWidth(z);
@@ -167,8 +165,8 @@ namespace Grid_Map
 
         public void ToggleLayer(int layerIndex)
         {
-            if (layerVisible == null || layerIndex < 0 || layerIndex >= layer) return;
-            layerVisible[layerIndex] = !layerVisible[layerIndex];
+            if (_layerVisible == null || layerIndex < 0 || layerIndex >= layer) return;
+            _layerVisible[layerIndex] = !_layerVisible[layerIndex];
         }
 
         Vector3 GetWorldPosition(Vector3 origin, int x, int y)

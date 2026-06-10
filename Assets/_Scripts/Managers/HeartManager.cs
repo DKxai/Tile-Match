@@ -1,8 +1,7 @@
 using System;
 using _Scripts.Data;
-using _Scripts.Utils.Event_Bus;
+using _Scripts.SaveSystem;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace _Scripts.Managers
 {
@@ -14,7 +13,6 @@ namespace _Scripts.Managers
         private const int MaxHearts = 5;
         private const float RechargeSeconds = 300f;
 
-        private readonly DataSystem _dataSystem = new();
         private DateTime _lastHeartTime;
         private Action<int> _onHeartsChanged;
 
@@ -44,8 +42,8 @@ namespace _Scripts.Managers
         protected override void Awake()
         {
             base.Awake();
-            Hearts = _dataSystem.LoadHearts();
-            _lastHeartTime = _dataSystem.LoadLastHeartTime();
+            Hearts = DataSystem.LoadHearts();
+            _lastHeartTime = DataSystem.LoadLastHeartTime();
             RecoverOfflineHearts();
         }
 
@@ -77,8 +75,8 @@ namespace _Scripts.Managers
             Hearts = Mathf.Min(Hearts + heartsToAdd, MaxHearts);
             _lastHeartTime = _lastHeartTime.AddSeconds(heartsToAdd * RechargeSeconds);
 
-            _dataSystem.SaveHearts(Hearts);
-            _dataSystem.SaveLastHeartTime(_lastHeartTime);
+            DataSystem.SaveHearts(Hearts);
+            DataSystem.SaveLastHeartTime(_lastHeartTime);
         }
 
         public void AddHeart()
@@ -86,8 +84,8 @@ namespace _Scripts.Managers
             Hearts = Mathf.Min(Hearts + 1, MaxHearts);
             _lastHeartTime = DateTime.Now;
 
-            _dataSystem.SaveHearts(Hearts);
-            _dataSystem.SaveLastHeartTime(_lastHeartTime);
+            DataSystem.SaveHearts(Hearts);
+            DataSystem.SaveLastHeartTime(_lastHeartTime);
 
             _onHeartsChanged?.Invoke(Hearts);
         }
@@ -99,11 +97,11 @@ namespace _Scripts.Managers
             if (Hearts == MaxHearts)
             {
                 _lastHeartTime = DateTime.Now;
-                _dataSystem.SaveLastHeartTime(_lastHeartTime);
+                DataSystem.SaveLastHeartTime(_lastHeartTime);
             }
 
             Hearts--;
-            _dataSystem.SaveHearts(Hearts);
+            DataSystem.SaveHearts(Hearts);
             _onHeartsChanged?.Invoke(Hearts);
         }
     }

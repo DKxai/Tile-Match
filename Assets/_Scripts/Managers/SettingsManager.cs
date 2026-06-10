@@ -1,11 +1,20 @@
+using System;
 using _Scripts.Data;
+using _Scripts.Data.Sounds;
+using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 
 namespace _Scripts.Managers
 {
-    public class SettingsManager : Singleton<SettingsManager>
+    public class SettingsManager : PersistentSingleton<SettingsManager>
     {
-        public SettingData SettingData { get; private set; }
+        private SettingData _data;
+
+        public float MusicValue => _data.MusicValue;
+        public float SoundValue => _data.SoundValue;
+        public bool VibrationEnable => _data.VibrationEnable;
+
+        public event Action<bool> OnVibrationChanged;
 
         protected override void Awake()
         {
@@ -15,41 +24,46 @@ namespace _Scripts.Managers
 
         private void Load()
         {
-            SettingData = new SettingData
+            _data = new SettingData
             {
-                SoundEnable = PlayerPrefs.GetInt("Sound", 1) == 1,
-                MusicEnable = PlayerPrefs.GetInt("Music", 1) == 1,
+                MusicValue = PlayerPrefs.GetFloat("Music", 1f),
+                SoundValue = PlayerPrefs.GetFloat("Sound", 1f),
                 VibrationEnable = PlayerPrefs.GetInt("Vibration", 1) == 1
             };
         }
 
-        private void Save()
+        public void Save()
         {
-            PlayerPrefs.SetInt("Music", SettingData.MusicEnable ? 1 : 0);
-            PlayerPrefs.SetInt("Sound", SettingData.SoundEnable ? 1 : 0);
-            PlayerPrefs.SetInt("Vibration", SettingData.VibrationEnable ? 1 : 0);
+            PlayerPrefs.SetFloat("Music", _data.MusicValue);
+            PlayerPrefs.SetFloat("Sound", _data.SoundValue);
+            PlayerPrefs.SetInt("Vibration", _data.VibrationEnable ? 1 : 0);
+
             PlayerPrefs.Save();
         }
-        public void SetMusic(bool value)
+
+        public void SetMusic(float value)
         {
-            SettingData.MusicEnable = value;
-            PlayerPrefs.SetInt("Music", value ? 1 : 0);
+            _data.MusicValue = value;
             Save();
-            // set music
+            EventBus.Publish(
+                new SetVolumeEvent(MixerType.MusicVolume, value)
+            );
         }
 
-        public void SetSound(bool value)
+        public void SetSound(float value)
         {
-            SettingData.SoundEnable = value;
-            PlayerPrefs.SetInt("Sound", value ? 1 : 0);
+            _data.SoundValue = value;
             Save();
+            EventBus.Publish(
+                new SetVolumeEvent(MixerType.SFXVolume, value)
+            );
         }
 
         public void SetVibration(bool value)
         {
-            SettingData.VibrationEnable = value;
-            PlayerPrefs.SetInt("Vibration", value ? 1 : 0);
+            _data.VibrationEnable = value;
             Save();
+            OnVibrationChanged?.Invoke(value);
         }
     }
 }

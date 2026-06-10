@@ -5778,7 +5778,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 708040243}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6397,7 +6397,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 697078022}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11197,7 +11197,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1076623044}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12720,7 +12720,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 854521404}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12906,7 +12906,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 599111205}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14639,7 +14639,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1413387415}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25749,7 +25749,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 542000637}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26402,7 +26402,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1531159376}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -27727,7 +27727,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 599111205}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -28526,7 +28526,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 289726813}
         m_TargetAssemblyTypeName: Close, Assembly-CSharp
-        m_MethodName: close
+        m_MethodName: CloseFunc
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

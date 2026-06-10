@@ -1,3 +1,4 @@
+using _Scripts.Core.Grid;
 using _Scripts.Core.Rules;
 using _Scripts.Core.Tile;
 using _Scripts.Data;
@@ -16,7 +17,7 @@ namespace _Scripts.Managers
         [Header("Settings")] [SerializeField] private int defaultWidth = 8;
         [SerializeField] private int defaultHeight = 8;
         [SerializeField] private int defaultLayers = 5;
-
+        [SerializeField] private bool spawnTiles = true;
         public TileGrid CurrentGrid { get; private set; }
         private GridView _gridView;
         public ITileValidator RuleValidator { get; private set; }
@@ -30,14 +31,16 @@ namespace _Scripts.Managers
 
         void Start()
         {
-            LoadLevel(0);
-            ToolManager.Instance.Initialize(spawner, shellManager);
+            int levelToLoad = PlayerPrefs.GetInt("SelectedLevel", PlayerPrefs.GetInt("CurrentLevel", 1));
+            LoadLevel(levelToLoad);
+            if (spawnTiles)
+                ToolManager.Instance.Initialize(spawner, shellManager);
         }
 
-        public void LoadLevel(int levelIndex)
+        public void LoadLevel(int level)
         {
             CurrentGrid = LevelSaveSystem.LoadLevel(
-                levelIndex, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+                level, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
             if (_gridView != null)
                 _gridView.LoadGrid(CurrentGrid);
@@ -88,17 +91,21 @@ namespace _Scripts.Managers
             Debug.Log($"[LevelManager] Level {savedLevel} saved & reloaded.");
 #endif
         }
-
-        // public void ClearLevel()
-        // {
-        //     spawner.Clear();
-        //     CurrentGrid = null;
-        // }
+        
 
         private void RefreshView()
         {
-            spawner.Clear();
-            spawner.Spawn(CurrentGrid);
+            if (spawnTiles)
+            {
+                spawner.Clear();
+                spawner.Spawn(CurrentGrid);
+            }
+            else
+            {
+                spawner.Clear();
+                if (_gridView != null)
+                    _gridView.LoadGrid(CurrentGrid);
+            }
         }
     }
 }

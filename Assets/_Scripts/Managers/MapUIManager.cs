@@ -1,12 +1,17 @@
 using System.Collections;
 using _Scripts.Data;
+using _Scripts.Data.Tool;
+using _Scripts.SaveSystem;
 using _Scripts.Systems;
 using _Scripts.UI;
 using _Scripts.UI.Tools_Confirm;
 using _Scripts.Utils.Event_Bus;
+using DG.Tweening;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using EventBus = _Scripts.Utils.Event_Bus.EventBus;
 
 namespace _Scripts.Managers
 {
@@ -21,7 +26,7 @@ namespace _Scripts.Managers
         [SerializeField] private Button adsBtn;
 
         [Header("Heart Popup")] [SerializeField]
-        private ConfirmPopupData addHeartPopupData; // data riêng cho popup thêm tim
+        private ConfirmPopupData addHeartPopupData;
 
         [SerializeField] private ConfirmPopupData adsPopupData;
 
@@ -31,13 +36,21 @@ namespace _Scripts.Managers
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private LevelNode[] nodes;
 
-        private const string PreSceneName = "Level";
-        private int CurrentLevel => PlayerPrefs.GetInt("CurrentLevel", 1);
+        [Header("Entry Animation")] [SerializeField]
+        private UIEntryConfig[] entryConfigs;
+
+        [SerializeField] private float duration = 0.5f;
+        [SerializeField] private Ease ease = Ease.OutBack;
+        [SerializeField] private float offsetDistance = 300f;
+        [SerializeField] private float delay = 0.35f;
+        private Vector2[] _targetPositions;
+        private int CurrentLevel => DataSystem.LoadCurrentLevel();
 
         protected override void Awake()
         {
             base.Awake();
             RegisterEvents();
+            PreAnimations();
         }
 
         protected override void OnDestroy()
@@ -71,8 +84,40 @@ namespace _Scripts.Managers
                 nodes[i].Setup(levelIndex);
             }
 
+            adsBtn.gameObject.SetActive(DataSystem.LoadAds());
             currentLevelBtn.GetComponentInChildren<TextMeshProUGUI>().text = $"Level {CurrentLevel}";
+            PlayEntryAnimations();
         }
+
+        #region EntryAnimation
+
+        private void PreAnimations()
+        {
+            _targetPositions = new Vector2[entryConfigs.Length];
+            for (int i = 0; i < entryConfigs.Length; i++)
+            {
+                var config = entryConfigs[i];
+                if (config.target == null) continue; // ✅ skip nếu null
+
+                _targetPositions[i] = config.target.anchoredPosition;
+                config.target.anchoredPosition += config.direction * offsetDistance;
+            }
+        }
+
+        private void PlayEntryAnimations()
+        {
+            for (int i = 0; i < entryConfigs.Length; i++)
+            {
+                var config = entryConfigs[i];
+                if (config.target == null) continue; // ✅ skip nếu null, không animate
+
+                config.target.DOAnchorPos(_targetPositions[i], duration) // ✅ animate nếu có target
+                    .SetEase(ease)
+                    .SetDelay(i * delay);
+            }
+        } 
+
+        #endregion
 
         #region Register & unregister events
 
@@ -98,14 +143,17 @@ namespace _Scripts.Managers
 
         private void CurrentLevelClicked()
         {
+            DataSystem.SaveSelectedLevel(CurrentLevel);
+
             ScrollToNode(nodes[CurrentLevel - 1].GetComponent<RectTransform>(), 1f);
-            StartCoroutine(LoadScene(PreSceneName + CurrentLevel));
+            StartCoroutine(LoadScene());
         }
 
-        private IEnumerator LoadScene(string sceneName)
+        private IEnumerator LoadScene()
         {
             yield return new WaitForSeconds(1f);
-            SceneLevelManager.Instance.LoadScene(sceneName); // dùng tham số truyền vào
+            HeartManager.Instance.SpendHeart();
+            EventBus.Publish(new LoadSceneEvent(SceneType.GameScene));
         }
 
         #region Scrolling
@@ -149,19 +197,20 @@ namespace _Scripts.Managers
             // 2) Trừ coin: if (CurrencyManager.Instance.HasEnoughCoins(cost)) { ...; HeartManager.Instance.AddHeart(); }
             // 3) Cộng thẳng:
             HeartManager.Instance.AddHeart();
-            EventBus.Publish(new PurchaseEvent(ToolType.Heart,addHeartPopupData.amount,addHeartPopupData.cost));
+            EventBus.Publish(new PurchaseEvent(ToolType.Heart, addHeartPopupData.amount, addHeartPopupData.cost));
         }
 
         private void OpenAdsUI()
         {
-            ShowConfirmPopup(adsPopupData,OnAdsBuyConfirm);
+            ShowConfirmPopup(adsPopupData, OnAdsBuyConfirm);
         }
 
         private void OnAdsBuyConfirm()
         {
             Debug.Log("No more Ads");
-            EventBus.Publish(new PurchaseEvent(ToolType.Ads,adsPopupData.amount,adsPopupData.cost));
-            adsBtn.gameObject.SetActive(false);
+            EventBus.Publish(new PurchaseEvent(ToolType.Ads, adsPopupData.amount, adsPopupData.cost));
+            DataSystem.SaveAds(false);
+            adsBtn.gameObject.SetActive(DataSystem.LoadAds());
         }
 
         #endregion
