@@ -1,4 +1,6 @@
 using _Scripts.Data;
+using _Scripts.Data.Tool;
+using _Scripts.Managers;
 using _Scripts.SaveSystem;
 using _Scripts.Utils;
 using _Scripts.Utils.Event_Bus;
@@ -96,8 +98,13 @@ namespace _Scripts.UI
 
         private void OnClicked()
         {
+            if(DataSystem.LoadHearts() == 0)
+            {
+                EventBus.Publish(new OnAddHeartButtonClickedEvent(ToolType.Heart));
+                return;
+            }
+            HeartManager.Instance.SpendHeart();
             DataSystem.SaveSelectedLevel(_levelIndex);
-            // TODO:    .....
             EventBus.Publish(new LoadSceneEvent(SceneType.GameScene));
         }
     }

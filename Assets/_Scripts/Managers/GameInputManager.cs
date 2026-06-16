@@ -41,6 +41,7 @@ namespace _Scripts.Managers
                 _lastClickTime = Time.time;
                 clickedTile.IsClicked = true;
                 hit.collider.enabled = false;
+                if (clickedTile.isHintTileCell) EventBus.Publish(new ClickedHintedTileCellEvent(clickedTile));
                 EventBus.Publish(new PlaySoundEvent(SoundType.TileSound));
                 EventBus.Publish(new TileClickEvent(clickedTile));
             }

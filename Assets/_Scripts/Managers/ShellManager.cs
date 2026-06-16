@@ -83,8 +83,6 @@ namespace _Scripts.Managers
             });
         }
 
-        // Chèn tile mới ngay sau nhóm cùng ID (giữ các tile cùng loại liền nhau),
-        // hoặc về cuối nếu chưa có tile cùng ID nào.
         private int FindInsertIndex(int id)
         {
             int last = -1;
@@ -95,7 +93,6 @@ namespace _Scripts.Managers
             return last == -1 ? tilesInShell.Count : last + 1;
         }
 
-        // Dời toàn bộ tile về đúng slot theo index hiện tại của chúng.
         private Sequence RelayoutShell()
         {
             Sequence seq = DOTween.Sequence();
@@ -126,7 +123,6 @@ namespace _Scripts.Managers
 
         private void RemoveMatching(int id)
         {
-            // Lấy ĐÚNG 3 tile cùng ID theo thứ tự thật, bỏ qua tile đang bị huỷ dở.
             var toDestroy = new List<TileCell>();
             foreach (var t in tilesInShell)
             {
@@ -199,6 +195,7 @@ namespace _Scripts.Managers
             if (boardEmpty && shellEmpty)
             {
                 _endingFired = true;
+                EventBus.Publish(new LevelClearedEvent(gridSpawner != null ? gridSpawner.CurrentGrid : null));
                 openEndingUI?.Invoke(EndingType.Win);
             }
         }
@@ -211,7 +208,6 @@ namespace _Scripts.Managers
         {
             Sequence sequence = DOTween.Sequence();
 
-            // Move tất cả slots sang trái nửa cell
             for (int i = 0; i < slots.Count; i++)
             {
                 Vector3 targetPos = slots[i].position + new Vector3(-cellSize / 2f, 0f, 0f);
@@ -225,7 +221,6 @@ namespace _Scripts.Managers
                 sequence.Join(tilesInShell[i].transform.DOMove(targetPos, 0.35f));
             }
 
-            // Sau khi move xong mới hiện slot mới
             sequence.OnComplete(() =>
             {
                 slots[slots.Count - 1].GetComponent<SpriteRenderer>().enabled = true;
@@ -253,5 +248,14 @@ namespace _Scripts.Managers
         }
 
         #endregion
+        public void ResetForNewLevel()
+        {
+            
+            _endingFired   = false;
+            _isDestroying  = false;
+            _fullSlots     = 0;
+            tilesInShell.Clear();
+            _destroyingCells.Clear();
+        }
     }
 }

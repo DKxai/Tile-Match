@@ -22,6 +22,9 @@ namespace _Scripts.Core.Grid
         public TileGrid CurrentGrid => _currentGrid;
         private void OnEnable() => EventBus.Subscribe<TileClickEvent>(OnTileClicked);
         private void OnDisable() => EventBus.Unsubscribe<TileClickEvent>(OnTileClicked);
+        public List<TileCell> CellsForHint = new List<TileCell>();
+        private int _cellHintedID = -1;
+        private int _hintStep = 0;
 
         private void OnTileClicked(TileClickEvent e)
         {
@@ -42,7 +45,8 @@ namespace _Scripts.Core.Grid
             _activeCells.Clear();
             for (int z = 0; z < grid.Layers; z++)
             {
-                Vector3 newOrigin = z % 2 == 0 ? origin.position : origin.position + new Vector3(0.5f, 0.5f, 0f) * cellSize
+                Vector3 newOrigin =
+                        z % 2 == 0 ? origin.position : origin.position + new Vector3(0.5f, 0.5f, 0f) * cellSize
                     ;
                 for (int y = grid.Height - 1; y >= 0; y--)
                 {
@@ -67,7 +71,7 @@ namespace _Scripts.Core.Grid
             }
 
             if (tileSpawner != null)
-                tileSpawner.Init();
+                tileSpawner.Init(_activeCells);
 
             RefreshAllCells(grid);
         }
@@ -79,6 +83,8 @@ namespace _Scripts.Core.Grid
                 if (cell != null)
                 {
                     cell.RefreshState(grid);
+                    if (!cell.IsBlocked)
+                        CellsForHint.Add(cell);
                 }
             }
         }
@@ -93,7 +99,11 @@ namespace _Scripts.Core.Grid
                 {
                     var key = new Vector3Int(pos.x, pos.y, layerBelow);
                     if (_cellMap.TryGetValue(key, out TileCell tileCell) && tileCell != null)
+                    {
                         tileCell.RefreshState(_currentGrid);
+                        if (!tileCell.IsBlocked)
+                            CellsForHint.Add(tileCell);
+                    }
                 }
             }
         }
@@ -110,16 +120,16 @@ namespace _Scripts.Core.Grid
 
             if (targetLayer % 2 == 0)
             {
-                positions.Add(new Vector2Int(gridX,     gridY));
+                positions.Add(new Vector2Int(gridX, gridY));
                 positions.Add(new Vector2Int(gridX + 1, gridY));
-                positions.Add(new Vector2Int(gridX,     gridY + 1));
+                positions.Add(new Vector2Int(gridX, gridY + 1));
                 positions.Add(new Vector2Int(gridX + 1, gridY + 1));
             }
             else
             {
-                positions.Add(new Vector2Int(gridX,     gridY));
+                positions.Add(new Vector2Int(gridX, gridY));
                 positions.Add(new Vector2Int(gridX - 1, gridY));
-                positions.Add(new Vector2Int(gridX,     gridY - 1));
+                positions.Add(new Vector2Int(gridX, gridY - 1));
                 positions.Add(new Vector2Int(gridX - 1, gridY - 1));
             }
 
@@ -128,6 +138,8 @@ namespace _Scripts.Core.Grid
 
         public void Clear()
         {
+            _cellHintedID = -1;
+            CellsForHint.Clear();
             _activeCells.Clear();
             _cellMap.Clear();
             _currentGrid = null;
@@ -136,6 +148,36 @@ namespace _Scripts.Core.Grid
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
+        }
+
+        public TileCell GetHintTileCells()
+        {
+            if (CellsForHint.Count == 0) return null;
+
+            TileCell cell;
+            if (_hintStep % 3 == 0)
+            {
+                int rand = Random.Range(0, CellsForHint.Count);
+                cell = CellsForHint[rand];
+                _cellHintedID = cell.ID;
+
+                foreach (var c in CellsForHint)
+                {
+                    if (c != null && c != cell)
+                        c.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+                }
+            }
+            else
+            {
+                cell = CellsForHint.Find(x => x != null && x.ID == _cellHintedID);
+                if (cell == null) return null;
+            }
+
+            cell.gameObject.GetComponent<BoxCollider2D>().enabled = true;
+            _hintStep++;
+            cell.isHintTileCell = true;
+            CellsForHint.Remove(cell);
+            return cell;
         }
     }
 }

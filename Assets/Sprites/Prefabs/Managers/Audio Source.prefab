@@ -409,7 +409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5792944074548902942}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -442,10 +442,10 @@ MonoBehaviour:
     MixerType: 2
     SoundClip: {fileID: 8300000, guid: 8ec9b95de5eda9af3a003a8f3965b001, type: 3}
   - SoundType: 2
-    MixerType: 3
+    MixerType: 2
     SoundClip: {fileID: 8300000, guid: 1b5db18b37eed50c49a5be85d616b43b, type: 3}
   - SoundType: 3
-    MixerType: 3
+    MixerType: 2
     SoundClip: {fileID: 8300000, guid: 5d3c96497c2975ccdbb3c5fff1ed77a5, type: 3}
   - SoundType: 4
     MixerType: 2

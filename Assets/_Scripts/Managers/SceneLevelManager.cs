@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using _Scripts.Data;
+using _Scripts.SaveSystem;
 using _Scripts.Utils.Event_Bus;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,7 +12,7 @@ namespace _Scripts.Managers
     public class SceneLevelManager : PersistentSingleton<SceneLevelManager>
     {
         [SerializeField] private CanvasGroup loaderCanvas;
-        [SerializeField] private Scrollbar loadingBar;
+        [SerializeField] private Image loadingBar;
         private float _target;
 
         private void OnEnable()
@@ -24,6 +26,18 @@ namespace _Scripts.Managers
             
         }
 
+        private void Start()
+        {
+            if (!DataSystem.IsTutorialDone)
+            {
+                LoadScene(SceneType.TutorialScene);
+            }
+            else
+            {
+                LoadScene(SceneType.MapScene);
+            }
+        }
+
         private void OnLoadScene(LoadSceneEvent evt)
         {
             LoadScene(evt.SceneType);
@@ -33,31 +47,37 @@ namespace _Scripts.Managers
             StartCoroutine(Load(sceneType.ToString()));
         }
 
-        IEnumerator Load(string sceneName)
+        private IEnumerator Load(string sceneName)
         {
-            loadingBar.value = 0f;
+            loadingBar.fillAmount = 0f;
             loaderCanvas.gameObject.SetActive(true);
 
-            yield return Fade(0f, 1f);
-
             AsyncOperation op = SceneManager.LoadSceneAsync(sceneName);
-
             op.allowSceneActivation = false;
-            do
+
+            while (op.progress < 0.9f)
             {
-                loadingBar.value = Mathf.Lerp(loadingBar.value, op.progress, Time.deltaTime * 8);
+                loadingBar.fillAmount = op.progress / 0.9f;
                 yield return null;
-            } while (op.progress < 0.9f);
+            }
 
-            loadingBar.value = 1f;
+            while (loadingBar.fillAmount < 1f)
+            {
+                loadingBar.fillAmount = Mathf.MoveTowards(
+                    loadingBar.fillAmount,
+                    1f,
+                    Time.deltaTime * 2f);
 
-            yield return new WaitForSeconds(0.3f);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.2f);
+
             op.allowSceneActivation = true;
 
-            while (!op.isDone) yield return null;
-            
-            yield return Fade(1f, 0f);
-            
+            while (!op.isDone)
+                yield return null;
+
             loaderCanvas.gameObject.SetActive(false);
         }
 

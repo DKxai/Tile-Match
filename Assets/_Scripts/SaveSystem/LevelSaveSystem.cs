@@ -8,23 +8,25 @@ namespace _Scripts.SaveSystem
     public static class LevelSaveSystem
     {
         private const string FileNameFormat = "level{0}.json";
+        private const string TutorialNameFormat = "level0_{0}.json";
 
-
-        private static string GetPersistentPath(int levelIndex)
+        private static string GetPersistentPath(int levelIndex, bool isTutorialScene = false)
         {
-            return Path.Combine(Application.persistentDataPath, string.Format(FileNameFormat, levelIndex));
+            var format = isTutorialScene ? TutorialNameFormat : FileNameFormat;
+            return Path.Combine(Application.persistentDataPath, string.Format(format, levelIndex));
         }
 
-
-        private static string GetResourcePath(int levelIndex)
+        private static string GetResourcePath(int levelIndex, bool isTutorialScene = false)
         {
-            return $"Levels/level{levelIndex}";
+            return isTutorialScene ? $"Levels/level0_{levelIndex}" : $"Levels/level{levelIndex}";
         }
-    
-        public static TileGrid LoadLevel(int levelIndex, int defaultWidth = 8, int defaultHeight = 7, int defaultLayers = 5)
-        {
-            string persistentPath = GetPersistentPath(levelIndex);
 
+        public static TileGrid LoadLevel(int levelIndex, bool isTutorialScene = false, int defaultWidth = 8,
+            int defaultHeight = 7,
+            int defaultLayers = 5)
+        {
+            string persistentPath = GetPersistentPath(levelIndex, isTutorialScene);
+            
             if (File.Exists(persistentPath))
             {
                 string json = File.ReadAllText(persistentPath);
@@ -32,7 +34,7 @@ namespace _Scripts.SaveSystem
                 return ParseJson(json, levelIndex, defaultWidth, defaultHeight, defaultLayers);
             }
 
-            TextAsset textAsset = Resources.Load<TextAsset>(GetResourcePath(levelIndex));
+            TextAsset textAsset = Resources.Load<TextAsset>(GetResourcePath(levelIndex, isTutorialScene));
 
             if (textAsset != null)
             {
@@ -45,9 +47,9 @@ namespace _Scripts.SaveSystem
         }
 
 
-        public static void SaveLevel(TileGrid grid)
+        public static void SaveLevel(TileGrid grid, bool isTutorialScene = false)
         {
-            string path = GetPersistentPath(grid.Level);
+            string path = GetPersistentPath(grid.Level, isTutorialScene);
             string json = JsonUtility.ToJson(grid.Save(), true);
 
             File.WriteAllText(path, json);
@@ -55,7 +57,8 @@ namespace _Scripts.SaveSystem
         }
 
 
-        private static TileGrid ParseJson(string json, int levelIndex, int defaultWidth, int defaultHeight, int defaultLayers)
+        private static TileGrid ParseJson(string json, int levelIndex, int defaultWidth, int defaultHeight,
+            int defaultLayers)
         {
             GridData data = JsonUtility.FromJson<GridData>(json);
 
@@ -69,7 +72,7 @@ namespace _Scripts.SaveSystem
         }
 
 #if UNITY_EDITOR
-        public static void ExportToResources(int levelIndex)
+        public static void ExportToResources(int levelIndex, bool isTutorialScene = false)
         {
             string src = GetPersistentPath(levelIndex);
 

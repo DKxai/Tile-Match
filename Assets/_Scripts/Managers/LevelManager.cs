@@ -1,3 +1,4 @@
+using System;
 using _Scripts.Core.Grid;
 using _Scripts.Core.Rules;
 using _Scripts.Core.Tile;
@@ -11,25 +12,27 @@ namespace _Scripts.Managers
     public class LevelManager : Singleton<LevelManager>
     {
         [Header("References")] [SerializeField]
-        private GridSpawner spawner;
+        protected GridSpawner spawner;
 
         [SerializeField] private ShellManager shellManager;
-        [Header("Settings")] [SerializeField] private int defaultWidth = 8;
-        [SerializeField] private int defaultHeight = 8;
-        [SerializeField] private int defaultLayers = 5;
+        [Header("Settings")] [SerializeField] protected int defaultWidth = 8;
+        [SerializeField] protected int defaultHeight = 8;
+        [SerializeField] protected int defaultLayers = 5;
         [SerializeField] private bool spawnTiles = true;
-        public TileGrid CurrentGrid { get; private set; }
-        private GridView _gridView;
+        public TileGrid CurrentGrid { get; protected set; }
+        protected GridView _gridView;
         public ITileValidator RuleValidator { get; private set; }
+        public event Action OnLevelClear;
 
         protected override void Awake()
         {
             base.Awake();
             RuleValidator = new StaggerGridValidator();
             _gridView = FindObjectOfType<GridView>();
+            
         }
 
-        void Start()
+        protected virtual void Start()
         {
             int levelToLoad = PlayerPrefs.GetInt("SelectedLevel", PlayerPrefs.GetInt("CurrentLevel", 1));
             LoadLevel(levelToLoad);
@@ -37,10 +40,12 @@ namespace _Scripts.Managers
                 ToolManager.Instance.Initialize(spawner, shellManager);
         }
 
-        public void LoadLevel(int level)
+        public void NotifyLevelClear() => OnLevelClear?.Invoke();
+
+        public virtual void LoadLevel(int level)
         {
             CurrentGrid = LevelSaveSystem.LoadLevel(
-                level, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+                level, false, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
             if (_gridView != null)
                 _gridView.LoadGrid(CurrentGrid);
@@ -82,7 +87,7 @@ namespace _Scripts.Managers
 
             int savedLevel = CurrentGrid.Level;
             CurrentGrid = LevelSaveSystem.LoadLevel(
-                savedLevel, defaultWidth + 1, defaultHeight + 1, defaultLayers);
+                savedLevel, false, defaultWidth + 1, defaultHeight + 1, defaultLayers);
 
             if (_gridView != null)
                 _gridView.LoadGrid(CurrentGrid);
@@ -91,10 +96,11 @@ namespace _Scripts.Managers
             Debug.Log($"[LevelManager] Level {savedLevel} saved & reloaded.");
 #endif
         }
-        
 
-        private void RefreshView()
+
+        protected void RefreshView()
         {
+            ShellManager.Instance.ResetForNewLevel();
             if (spawnTiles)
             {
                 spawner.Clear();

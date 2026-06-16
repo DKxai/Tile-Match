@@ -33,8 +33,8 @@ namespace _Scripts.Managers
         [Header("References")] [SerializeField]
         private RectTransform content;
 
+        [SerializeField] private GameObject nodeParent;
         [SerializeField] private ScrollRect scrollRect;
-        [SerializeField] private LevelNode[] nodes;
 
         [Header("Entry Animation")] [SerializeField]
         private UIEntryConfig[] entryConfigs;
@@ -44,6 +44,7 @@ namespace _Scripts.Managers
         [SerializeField] private float offsetDistance = 300f;
         [SerializeField] private float delay = 0.35f;
         private Vector2[] _targetPositions;
+        private LevelNode[] nodes;
         private int CurrentLevel => DataSystem.LoadCurrentLevel();
 
         protected override void Awake()
@@ -51,6 +52,8 @@ namespace _Scripts.Managers
             base.Awake();
             RegisterEvents();
             PreAnimations();
+            nodes = nodeParent.GetComponentsInChildren<LevelNode>();
+            ScrollToNode(nodes[CurrentLevel - 1].GetComponent<RectTransform>(), 1f);
         }
 
         protected override void OnDestroy()
@@ -97,7 +100,7 @@ namespace _Scripts.Managers
             for (int i = 0; i < entryConfigs.Length; i++)
             {
                 var config = entryConfigs[i];
-                if (config.target == null) continue; // ✅ skip nếu null
+                if (config.target == null) continue; 
 
                 _targetPositions[i] = config.target.anchoredPosition;
                 config.target.anchoredPosition += config.direction * offsetDistance;
@@ -109,13 +112,13 @@ namespace _Scripts.Managers
             for (int i = 0; i < entryConfigs.Length; i++)
             {
                 var config = entryConfigs[i];
-                if (config.target == null) continue; // ✅ skip nếu null, không animate
+                if (config.target == null) continue; 
 
-                config.target.DOAnchorPos(_targetPositions[i], duration) // ✅ animate nếu có target
+                config.target.DOAnchorPos(_targetPositions[i], duration)
                     .SetEase(ease)
                     .SetDelay(i * delay);
             }
-        } 
+        }
 
         #endregion
 
@@ -143,6 +146,12 @@ namespace _Scripts.Managers
 
         private void CurrentLevelClicked()
         {
+            if (DataSystem.LoadHearts() == 0)
+            {
+                EventBus.Publish(new OnAddHeartButtonClickedEvent(ToolType.Heart));
+                return;
+            }
+
             DataSystem.SaveSelectedLevel(CurrentLevel);
 
             ScrollToNode(nodes[CurrentLevel - 1].GetComponent<RectTransform>(), 1f);
@@ -151,7 +160,7 @@ namespace _Scripts.Managers
 
         private IEnumerator LoadScene()
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
             HeartManager.Instance.SpendHeart();
             EventBus.Publish(new LoadSceneEvent(SceneType.GameScene));
         }
@@ -163,9 +172,27 @@ namespace _Scripts.Managers
 
         private IEnumerator ScrollToMiddle(RectTransform nodeRect, float duration)
         {
-            float contentHeight = content.rect.height;
-            float nodeLocalY = nodeRect.anchoredPosition.y;
-            float target = Mathf.Clamp01(nodeLocalY / contentHeight);
+            Canvas.ForceUpdateCanvases();
+
+            RectTransform viewport = scrollRect.viewport != null
+                ? scrollRect.viewport
+                : (RectTransform)scrollRect.transform;
+
+            float viewportHeight = viewport.rect.height;
+            float contentHeight  = content.rect.height;
+            float scrollable     = contentHeight - viewportHeight;
+
+            if (scrollable <= 0f) yield break;
+
+            Vector3 worldCenter = nodeRect.TransformPoint(nodeRect.rect.center);
+            Vector3 localCenter = content.InverseTransformPoint(worldCenter);
+
+            float distFromTop = content.rect.yMax - localCenter.y;
+
+            float offset = distFromTop - viewportHeight * 0.5f;
+
+            float targetNorm = 1f - Mathf.Clamp01(offset / scrollable);
+
             float start = scrollRect.verticalNormalizedPosition;
             float elapse = 0f;
 
@@ -173,10 +200,12 @@ namespace _Scripts.Managers
             {
                 elapse += Time.deltaTime;
                 float t = elapse / duration;
-                t = t * t * (3f - 2f * t);
-                scrollRect.verticalNormalizedPosition = Mathf.Lerp(start, target, t);
+                t = t * t * (3f - 2f * t); 
+                scrollRect.verticalNormalizedPosition = Mathf.Lerp(start, targetNorm, t);
                 yield return null;
             }
+
+            scrollRect.verticalNormalizedPosition = targetNorm; 
         }
 
         #endregion
@@ -185,19 +214,20 @@ namespace _Scripts.Managers
 
         private void OpenStorePopup() => StoreManager.Instance.ShowStore();
 
+        private void OpenHeartPopUp(OnAddHeartButtonClickedEvent evt) => OpenHeartPopUp();
+
         private void OpenHeartPopUp() =>
             ShowConfirmPopup(addHeartPopupData, OnAddHeartConfirmed);
 
-        private void OpenHeartPopUp(OnAddHeartButtonClickedEvent evt) => OpenHeartPopUp();
 
         private void OnAddHeartConfirmed()
         {
-            // TODO: chọn 1 trong các hành vi tùy game design của bạn:
-            // 1) Xem quảng cáo thưởng rồi cộng tim (gọi AddHeart trong callback thành công)
-            // 2) Trừ coin: if (CurrencyManager.Instance.HasEnoughCoins(cost)) { ...; HeartManager.Instance.AddHeart(); }
-            // 3) Cộng thẳng:
             HeartManager.Instance.AddHeart();
             EventBus.Publish(new PurchaseEvent(ToolType.Heart, addHeartPopupData.amount, addHeartPopupData.cost));
+            if (DataSystem.LoadHearts() == 5)
+            {
+                confirmPopup.PlayHideAnimation();
+            }
         }
 
         private void OpenAdsUI()

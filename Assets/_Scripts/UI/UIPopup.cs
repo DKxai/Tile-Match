@@ -47,7 +47,7 @@ namespace _Scripts.UI
                 .SetUpdate(true);
         }
 
-        protected virtual void PlayHideAnimation()
+        public virtual void PlayHideAnimation()
         {
             panel.DOKill(true);
             canvasGroup.DOKill(true);

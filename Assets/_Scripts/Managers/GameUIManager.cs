@@ -29,13 +29,13 @@ namespace _Scripts.Managers
 
         private int CurrentLevel => DataSystem.LoadSelectedLevel();
 
-        protected override void Awake() // <-- override + gọi base
+        protected override void Awake() 
         {
             base.Awake();
             homeButton.onClick.AddListener(OnHomeClicked);
         }
 
-        protected override void OnDestroy() // <-- override + gọi base
+        protected override void OnDestroy() 
         {
             base.OnDestroy();
             homeButton.onClick.RemoveListener(OnHomeClicked);
@@ -44,17 +44,21 @@ namespace _Scripts.Managers
         private void OnEnable()
         {
             EventBus.Subscribe<OutOfToolUseEvent>(ConfirmPopupShow);
-            ShellManager.Instance.openEndingUI += OpenEndingUI;
         }
 
         private void OnDisable()
         {
             EventBus.Unsubscribe<OutOfToolUseEvent>(ConfirmPopupShow);
-            ShellManager.Instance.openEndingUI -= OpenEndingUI;
+            if (ShellManager.Instance != null)
+                ShellManager.Instance.openEndingUI -= OpenEndingUI;
         }
 
 
-        private void Start() => titleText.text = "Level " + CurrentLevel;
+        private void Start()
+        {
+            titleText.text = "Level " + CurrentLevel;
+            ShellManager.Instance.openEndingUI += OpenEndingUI;
+        }
 
         private void OnHomeClicked() =>
             ConfirmPopupShow(new OutOfToolUseEvent(ToolType.Quit));

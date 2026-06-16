@@ -7,6 +7,8 @@ namespace _Scripts.SaveSystem
 {
     public static class DataSystem
     {
+        private const string TutorialKey = "tutorial";
+
         private const string CurrentLevelKey = "CurrentLevel";
         private const string SelectedLevelKey = "SelectedLevel";
         private const string CoinsKey = "Coins";
@@ -17,11 +19,25 @@ namespace _Scripts.SaveSystem
         private const string ShuffleKey = "Shuffle";
         private const string AdsKey = "Ads";
 
-        private const int DefaultLevel = 2;
+        private const int DefaultLevel = 1;
         private const int DefaultCoins = 100;
         private const int DefaultHearts = 5;
         private const int DefaultToolUse = 0;
         private const int AdsEnabled = 1;
+
+        #region Tutorial
+
+        public static bool IsTutorialDone => PlayerPrefs.GetInt(TutorialKey, 0) == 1;
+
+        public static void MarkDone()
+        {
+            PlayerPrefs.SetInt(TutorialKey, 1);
+            PlayerPrefs.Save();
+        }
+
+        public static void Reset() => PlayerPrefs.DeleteKey(TutorialKey);
+
+        #endregion
 
         #region CurrentLevel
 
@@ -80,7 +96,6 @@ namespace _Scripts.SaveSystem
             PlayerPrefs.SetInt(toolType.ToString(), use);
             PlayerPrefs.Save();
         }
-        
 
         #endregion
 
@@ -88,7 +103,7 @@ namespace _Scripts.SaveSystem
 
         public static bool LoadAds()
         {
-            return PlayerPrefs.GetInt(AdsKey, AdsEnabled) == 1? true : false;
+            return PlayerPrefs.GetInt(AdsKey, AdsEnabled) == 1 ? true : false;
         }
 
         public static void SaveAds(bool isEnabled)
@@ -99,6 +114,7 @@ namespace _Scripts.SaveSystem
         }
 
         #endregion
+
         public static void SaveLastHeartTime(DateTime time)
         {
             PlayerPrefs.SetString(LastHeartTimeKey, time.ToBinary().ToString());

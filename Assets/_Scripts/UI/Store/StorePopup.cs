@@ -116,7 +116,7 @@ namespace _Scripts.UI.Store
                     .SetDelay(i * stagger);
             }
         }
-        protected override void PlayHideAnimation()
+        public override void PlayHideAnimation()
         {
             panel.DOKill();
             canvasGroup.DOKill();

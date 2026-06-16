@@ -18,7 +18,9 @@ namespace _Scripts.Core.Tile
         public Vector3 worldPos;
         private Collider2D col;
         private SpriteRenderer[] sr;
+        public bool isHintTileCell = false;
         public Vector3Int GridPos() => new Vector3Int(gridX, gridY, gridZ);
+        public bool IsBlocked { get; private set; }
 
         private void Awake()
         {
@@ -31,7 +33,7 @@ namespace _Scripts.Core.Tile
             transform.DOPunchScale(Vector3.one * 0.3f, 0.5f, 10, 0.8f);
         }
 
-        public void SetupCell(int x, int y, int layer,Vector3 worldPosition)
+        public void SetupCell(int x, int y, int layer, Vector3 worldPosition)
         {
             gridX = x;
             gridY = y;
@@ -44,11 +46,11 @@ namespace _Scripts.Core.Tile
         {
             if (IsClicked) return;
 
-            bool isBlocked = LevelManager.Instance.RuleValidator.isTileBlocked(grid, gridX, gridY, gridZ);
+            IsBlocked = LevelManager.Instance.RuleValidator.isTileBlocked(grid, gridX, gridY, gridZ);
 
-            if (col != null) col.enabled = !isBlocked;
+            if (col != null) col.enabled = !IsBlocked;
 
-            float brightness = isBlocked ? 0.5f : 1f;
+            float brightness = IsBlocked ? 0.5f : 1f;
 
             foreach (var s in sr)
             {
@@ -56,7 +58,10 @@ namespace _Scripts.Core.Tile
                 {
                     Color c = s.color;
 
-                    s.color = new Color(brightness, brightness, brightness, c.a);
+                    // s.color = new Color(brightness, brightness, brightness, c.a);
+                    s.DOKill();
+                    s.DOColor(new Color(brightness, brightness, brightness, c.a), 0.35f).SetDelay(0.15f);
+
                 }
             }
         }

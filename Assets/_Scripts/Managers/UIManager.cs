@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace _Scripts.Managers
 {
-    public abstract class UIManager : Singleton<UIManager>
+    public abstract class UIManager : MonoBehaviour
     {
         [Header("Shared")]
         [SerializeField] protected ConfirmPopup confirmPopup;
@@ -19,9 +19,8 @@ namespace _Scripts.Managers
         [SerializeField] protected SettingsPopup settingsPopup;
         [SerializeField] private Button settingsButton;
 
-        protected override void Awake()
+        protected  virtual void Awake()
         {
-            base.Awake();
             if (settingsButton != null)
                 settingsButton.onClick.AddListener(OnSettingsClicked);
         }
