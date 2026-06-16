@@ -3139,6 +3139,34 @@ PrefabInstance:
       propertyPath: addHeartPopupData.isDisplayHeartUI
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[2].data.icon
+      value: 
+      objectReference: {fileID: 21300000, guid: f78b26206d1158514a350965ce9f13d8, type: 3}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[0].data.title
+      value: Shuffle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[1].data.title
+      value: More Slot
+      objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[2].data.title
+      value: 'Return '
+      objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[0].data.description
+      value: Shuffle The Grid
+      objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[1].data.description
+      value: One Slot for Shell
+      objectReference: {fileID: 0}
+    - target: {fileID: 7532867007377460972, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
+      propertyPath: confirmPopupDataMappings.Array.data[2].data.description
+      value: Return 3 Tiles
+      objectReference: {fileID: 0}
     - target: {fileID: 7574886786584103791, guid: 4ca659189ccbdbdd98df58cbc815992d, type: 3}
       propertyPath: m_Name
       value: Game UI Manager

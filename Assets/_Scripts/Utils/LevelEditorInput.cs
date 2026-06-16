@@ -2,6 +2,7 @@
 using _Scripts.Core.Grid;
 using _Scripts.Managers;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Grid_Map;
 
 public class LevelEditorInput : MonoBehaviour
@@ -19,11 +20,16 @@ public class LevelEditorInput : MonoBehaviour
     {
         if (levelManager == null || levelManager.CurrentGrid == null) return;
         if (gridView == null) return;
-        
-        if (!Input.GetMouseButtonDown(0)) return;
+
+        if (Mouse.current == null ||
+            !Mouse.current.leftButton.wasPressedThisFrame)
+            return;
+
         if (Camera.main == null) return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+
+        Ray ray = Camera.main.ScreenPointToRay(mousePos);
         Plane plane = new Plane(Vector3.forward, gridView.transform.position);
 
         if (plane.Raycast(ray, out float distance))
@@ -42,12 +48,14 @@ public class LevelEditorInput : MonoBehaviour
             if (x >= 0 && x < lw && y >= 0 && y < lh)
             {
                 TileGrid currentGrid = levelManager.CurrentGrid;
-                
+
                 int currentVal = currentGrid.GetValue(x, y, currentLayer);
                 int newVal = currentVal == 0 ? 1 : 0;
-                
+
                 currentGrid.SetValue(x, y, currentLayer, newVal);
-                Debug.Log($"[LevelEditor] SetValue ({x}, {y}, Layer: {currentLayer}) = {newVal}");
+
+                Debug.Log(
+                    $"[LevelEditor] SetValue ({x}, {y}, Layer: {currentLayer}) = {newVal}");
             }
         }
     }
@@ -59,6 +67,7 @@ public class LevelEditorInput : MonoBehaviour
             : Vector3.zero;
 
         localPos -= offset;
+
         x = Mathf.FloorToInt(localPos.x / cellSize);
         y = Mathf.FloorToInt(localPos.y / cellSize);
     }

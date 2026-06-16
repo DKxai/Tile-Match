@@ -58,7 +58,6 @@ namespace _Scripts.Core.Tile
                 {
                     Color c = s.color;
 
-                    // s.color = new Color(brightness, brightness, brightness, c.a);
                     s.DOKill();
                     s.DOColor(new Color(brightness, brightness, brightness, c.a), 0.35f).SetDelay(0.15f);
 

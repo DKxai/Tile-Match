@@ -78,6 +78,7 @@ namespace _Scripts.Core.Grid
 
         public void RefreshAllCells(TileGrid grid)
         {
+            CellsForHint.Clear();
             foreach (var cell in _activeCells)
             {
                 if (cell != null)
@@ -105,6 +106,18 @@ namespace _Scripts.Core.Grid
                             CellsForHint.Add(tileCell);
                     }
                 }
+            }
+        }
+
+        public void RebuildCellMap()
+        {
+            _cellMap.Clear();
+
+            foreach (var cell in _activeCells)
+            {
+                if (cell == null) continue;
+
+                _cellMap[new Vector3Int(cell.gridX, cell.gridY, cell.gridZ)] = cell;
             }
         }
 

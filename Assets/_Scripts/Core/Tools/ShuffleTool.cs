@@ -7,12 +7,6 @@ using Random = UnityEngine.Random;
 
 namespace _Scripts.Core.Tools
 {
-    /// <summary>
-    /// shuffle base on active cells in scene and reload ( or respawn base on grid view) or level
-    /// because when click on cell -> value of that cell in Array return to 0
-    /// but currently when spawn it check number of TileCell that not include in
-    /// base Shell so that can invalid to random.
-    /// </summary>
     public class ShuffleTool : BaseToolCommand
     {
         private readonly GridSpawner _gridSpawner;
@@ -29,12 +23,10 @@ namespace _Scripts.Core.Tools
         }
 
 
-
         public override void Execute()
         {
             if (!CanExecute())
                 return;
-            // Implement business login here
             var tiles = _gridSpawner.ActiveCells;
 
             for (int i = tiles.Count - 1; i > 0; i--)
@@ -43,7 +35,7 @@ namespace _Scripts.Core.Tools
 
                 Vector3Int pos1 = tiles[i].GridPos();
                 Vector3Int pos2 = tiles[j].GridPos();
-                
+
                 Vector3 worldPos1 = tiles[i].worldPos;
                 Vector3 worldPos2 = tiles[j].worldPos;
 
@@ -57,6 +49,9 @@ namespace _Scripts.Core.Tools
             {
                 tile.MoveToWorldPosition(tile.worldPos);
             }
+
+            _gridSpawner.RebuildCellMap();
+
             _gridSpawner.RefreshAllCells(_gridSpawner.CurrentGrid);
             ComsumeUse();
         }

@@ -53,23 +53,23 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ef4c0698cb9bd3af496b2e6500adaad8, type: 3}
     - {fileID: 21300000, guid: f78b26206d1158514a350965ce9f13d8, type: 3}
     - {fileID: 21300000, guid: 579078a9250b1b7a3b8da637b21b6917, type: 3}
-    Price: 100
+    Price: 7
     RewardAmount: 5
   - Id: 2
     Type: 2
     Icons:
     - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
-    Price: 100
+    Price: 5
     RewardAmount: 200
   - Id: 3
     Type: 2
     Icons:
     - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
-    Price: 100
+    Price: 7
     RewardAmount: 500
   - Id: 4
     Type: 2
     Icons:
     - {fileID: 21300000, guid: 8a997273f27b161dbb6b7ad29fcbb7be, type: 3}
-    Price: 300
+    Price: 12
     RewardAmount: 1000
