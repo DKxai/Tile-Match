@@ -16,6 +16,7 @@
 
 
 ## Video Demo
+https://github.com/user-attachments/assets/66800e05-36b1-4ab3-8234-415f10193dc4
 
 ## Screenshots
 <table align="center">
@@ -34,6 +35,7 @@
     <td><img src="docs/tutorial.jpg" height="220"/></td>
   </tr>
 </table>
+
 ## Technical Highlights
 
 ### Architecture
